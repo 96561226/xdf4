@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加合同的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <table class="layui-table" id="tab">
+            <tr>
+                <td>*合同全称</td>
+                <td colspan="8">
+                    <input type="text" id="pname" name="pname" required lay-verify="required"  class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>合同编号</td>
+                <td colspan="2">
+                    <input disabled type="button" style="width: 100%;text-align: left" id="p_no" name="p_no"  class="layui-btn layui-btn-primary">
+                </td>
+                <td>合同金额</td>
+                <td colspan="2">
+                    <input type="text" name="pactmoney" id="pactmoney" class="layui-input">
+                </td>
+                <td>回款额</td>
+                <td colspan="2">
+                    <input type="text" name="returned" id="returned" class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>开票额</td>
+                <td colspan="2">
+                    <input type="text" id="billing" name="billing" required lay-verify="required"  class="layui-input">
+                </td>
+                <td>签约日期</td>
+                <td colspan="2">
+                    <input type="text" id="contractDate" name="contractDate"   class="layui-input">
+                </td>
+                <td>服务期至</td>
+                <td colspan="2">
+                    <input type="text" id="endtDate" name="endtDate"   class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>合同所属部门</td>
+                <td colspan="2">
+                    <select lay-filter="role" name="dept_id" id="dept_id" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>客户名称</td>
+                <td colspan="2">
+                    <select lay-filter="role" name="c_id" id="c_id" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>责任人</td>
+                <td colspan="2">
+                    <select lay-filter="role" name="emp_id" id="emp_id" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>合同的详情内容</td>
+                <td colspan="8">
+                    <textarea id="details" name="details" placeholder="请输入合同的详情内容" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+        </table>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批人</label>
+            <div id="action_emp_ids" name="action_emp_ids" class="demo-transfer"></div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

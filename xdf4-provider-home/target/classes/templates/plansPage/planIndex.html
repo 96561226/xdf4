@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示所有的计划</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--员工编号-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+
+<div th:replace="plansPage/plan_search::search"></div>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+<!--防止图片一半显示-->
+<style rel="stylesheet">
+    .layui-table-cell{
+        text-align:center;
+        height: auto;
+        white-space: normal;
+    }
+    .layui-table img{
+        max-width:100%;
+    }
+    .layui-table-cell .layui-form-checkbox [lay-skin="primary"]{
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+
+
+</style>
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="detail">查看</a>
+</script>
+
+<script type="text/html" id="plan_spxz">
+
+    {{#  if(d.state_id === 1){ }}
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批选择</label>
+            <div class="layui-input-block">
+                <input class="radio" type="radio" lay-filter="formstate" name="formstate" value="2" th:text="通过" />
+                <br><input class="radio" type="radio" lay-filter="formstate" name="formstate" value="3" th:text="退回" />
+                <br><input class="radio" type="radio" lay-filter="formstate" name="formstate" value="4" th:text="作废" />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="plan_sub" >审批确认</button>
+            </div>
+        </div>
+    {{#  } }}
+
+    {{#  if(d.state_id === 2){ }}
+        <div class="layui-form-item">
+            <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+            <div class="layui-input-block">
+                <input type="hidden" name="formstate" value="5" text="归档"/>
+                <button class="layui-btn" lay-submit lay-filter="plan_sub">确认归档</button>
+            </div>
+        </div>
+    {{#  } }}
+
+</script>
+<!--添加和修改的弹出层-->
+<div th:replace="plansPage/plan_detail::detail_common"></div>
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','form','laydate','laytpl'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var planDetail = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+
+        var laytpl = layui.laytpl;
+
+        //初始化日期控件
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({elem: '#ssdate' /*指定元素*/,type: 'datetime'});
+        laydate.render({elem: '#sedate' /*指定元素*/,type: 'datetime'});
+        laydate.render({elem: '#sdate' /*指定元素*/,type: 'datetime'});
+        laydate.render({elem: '#edate' /*指定元素*/,type: 'datetime'});
+        var layerId; //用来保存弹出层的id
+
+        //渲染表格
+        var tableIndex;
+        $.ajax({
+            url:'[[@{/consumer/plan/plans}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                    tableIndex = table.render({
+                    elem: '#demo'
+                    ,id:'demo'
+                    ,height: 608
+                    ,data:res.data
+                    ,text:{none:'暂无相关数据'}
+                    ,page: true //开启分页
+                    ,page:{
+                        limit:6
+                        ,limits:[3,6,10,15,25]
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                        ,count:res.count
+                    }
+                    ,cols: [
+                        [
+                            // {type:'checkbox'},
+                            {field:'plan_no', title:'计划编号'}
+                            ,{field:'title', title:'计划名称'}
+                            ,{field:'planSchedulings', title:'计划事项',
+                            templet:
+                                function(d){
+                                    var schedulings = "";
+                                    var ary = d.planSchedulings;
+                                    ary.forEach(function (item,index) {
+                                        schedulings += item.scheduling+",<br/>"
+                                    })
+                                    return schedulings;
+                                }
+                        }
+                            ,{field:'emp_name', title:'创建人'}
+                            ,{field:'dept_name', title:'所属部门'}
+                            ,{field:'cdate', title:'创建日期'}
+                            ,{field:'planCharges', title:'审批人',
+                            templet:
+                                function(d){
+                                    var schedulings = "";
+                                    var ary = d.planCharges;
+                                    ary.forEach(function (item,index) {
+                                        schedulings += item.emp_name+"（"+item.state_name+"）,<br/>"
+                                    })
+                                    return schedulings;
+                                }
+                        }
+                            ,{field:'fstate_name', title:'当前状态'}
+                            ,{toolbar: '#barDemo',title:'操作',align:'center'}
+                        ]
+                    ]
+
+                });
+            }
+        });
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "detail"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#detail")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['900px','600px']
+                    ,success:function(){
+                        // alert(row.plan_no);
+                        $.ajax({
+                            url:'[[@{/consumer/plan/plans}]]',
+                            data:{plan_no:row.plan_no},
+                            type:'get',
+                            dataType:'json',
+                            success:function(res){
+                                var planVo = res.data[0];
+
+                                $("#dtitle").val(planVo.title);
+                                $("#dtype_name").val(planVo.type_name);
+                                $("#dpname").val(planVo.pname);
+                                $("#demp_name").val(planVo.emp_name);
+                                $("#ddept_name").val(planVo.dept_name);
+                                $("#dsdate").val(planVo.sdate);
+                                $("#dedate").val(planVo.edate);
+
+                                var psr = "";
+                                $.each(planVo.planCharges,function(i,v){
+                                    psr += v.emp_name+",";
+                                    if(v.charge_emp_id==$("#dqyg").text()){
+                                        var statedata = {
+                                            "state_id" : planVo.state,
+                                            "state_name": planVo.fstate_name
+                                        };
+                                        var getTpl = plan_spxz.innerHTML
+                                            ,view = document.getElementById('dplan_state');
+                                        laytpl(getTpl).render(statedata, function(html){
+                                            view.innerHTML = html;
+                                        });
+                                    }
+                                });
+                                $("#dcgarge").val(psr);
+
+                                var zxr = "";
+                                $.each(planVo.planActions,function(i,v){
+                                    zxr += v.emp_name+",";
+                                });
+                                $("#daction").val(zxr);
+
+                                var tableDetail = planDetail.render({
+                                    elem: '#plan_detail'
+                                    ,id:'plan_detail'
+                                    ,height: 399
+                                    ,data: planVo.planSchedulings //数据接口
+                                    ,toolbar:true
+                                    ,text:{none:'暂无相关数据'}
+                                    ,cols: [
+                                        [
+                                            {type:'numbers'},
+                                            {field:'scheduling',title:'计划事项'},
+                                            {field:'adate',title:'执行日期'}
+                                        ],
+                                    ]
+                                });
+                                form.render();
+                                form.on('submit(plan_sub)', function(data){
+                                    //获取表单区域所有值
+
+                                    var data1 = form.val("planForm");
+                                    var state = data1.formstate;
+                                    alert(state);
+                                    var plan_id = planVo.plan_id;
+                                    // alert(state);
+                                    $.ajax({
+                                        url:'[[@{/consumer/plan/spplan}]]',
+                                        data:{state:state,plan_id:plan_id},
+                                        type:'POST',
+                                        dataType:'json',
+                                        success:function(res){
+
+                                            window.location.reload();
+                                        }
+                                    });
+                                    return false;
+                                });
+                            }
+                        })
+                    }
+                });
+
+            }
+        });
+        //加载部门下拉列表框
+        $.ajax({
+            url:'[[@{/ds/depts}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                // alert(res.data[0].dept_id);
+                $.each(res.data,function(i,v){
+                    // alert("******i:"+i)
+                    // alert("*****v:"+v.dept_id)
+                    content += "<option value='"+v.dept_id+"'>"+v.dept_name+"</option>";
+                });
+                $("#dept_id").append(content);
+                $("#sdept_id").append(content);
+                form.render('select','dataFrm');
+                form.render('select','searchFrm');
+            }
+        });
+        //加载状态下拉列表框
+        $.ajax({
+            url:'[[@{/formapi/fstates}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                // alert(res.data[0].dept_id);
+                $.each(res.data,function(i,v){
+                    // alert("******i:"+i)
+                    // alert("*****v:"+v.dept_id)
+                    content += "<option value='"+v.state_id+"'>"+v.fstate_name+"</option>";
+                });
+                // $("#dept_id").append(content);
+                $("#sstate_id").append(content);
+                form.render('select','dataFrm');
+                form.render('select','searchFrm');
+            }
+        });
+
+        //加载计划类型下拉列表框
+        $.ajax({
+            url:'[[@{/consumer/plan/selPlanTypes}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                // alert(res.data[0].dept_id);
+                $.each(res.data,function(i,v){
+                    // alert("******i:"+i)
+                    // alert("*****v:"+v.dept_id)
+                    content += "<option value='"+v.plan_tid+"'>"+v.name+"</option>";
+                });
+                $("#plan_tid").append(content);
+                $("#splan_tid").append(content);
+                form.render('select','dataFrm');
+                form.render('select','searchFrm');
+            }
+        });
+
+        //刷新多条件查询
+        function refresh(){
+            var plan_no = $("#splan_no").val();
+            var title = $("#stitle").val();
+            var dept_id = $("#sdept_id").val();
+            var parent_no = $("#sparent_no").val();
+            var sdate = $("#ssdate").val();
+            var edate = $("#sedate").val();
+            var state = $("#sstate_id").val();
+            var type = $("#splan_tid").val();
+            var emp_id= null;
+            var action_emp_id= null;
+            var charge_emp_id = null;
+
+            var cxfw = $("#splan_fw").val();
+            switch (cxfw) {
+                case '0':break;
+                case '1':emp_id=$("#dqyg").text();break;
+                case '2':action_emp_id=$("#dqyg").text();break;
+                case '3':charge_emp_id=$("#dqyg").text();break;
+            }
+            $.ajax({
+                url: '[[@{/consumer/plan/plans}]]',
+                type: 'GET',
+                dateType: 'json',
+                data:{
+                    plan_no:plan_no,
+                    title:'%'+title+'%',
+                    dept_id:dept_id,
+                    parent_no:parent_no,
+                    sdate:sdate,
+                    edate:edate,
+                    state:state,
+                    type:type,
+                    emp_id:emp_id,
+                    action_emp_id:action_emp_id,
+                    charge_emp_id:charge_emp_id
+                },
+                success:function (res) {
+                    tableIndex.reload(//重载，where后面设置的是传给后台的参数
+                        {
+                            data:res.data
+                        }
+                    );
+                }
+            })
+
+
+        }
+        $("#doSearch").click(function(){
+            refresh();
+        });
+
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.travelling.TravellingApproverMapper">
+
+    <resultMap id="tbTravellingApproverMap" type="com.aaa.pojo.finance.TbTravellingApprover">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="travelling_id" jdbcType="INTEGER" property="travellingId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <resultMap id="tbTravellingApproverVoMap" type="com.aaa.pojo.finance.TbTravellingApproverVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="travelling_id" jdbcType="INTEGER" property="travellingId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    </resultMap>
+    <select id="selectAllApproverByTravellingId" parameterType="Integer" resultMap="tbTravellingApproverVoMap">
+        select approver.*,te.emp_name,tas.state_name from tb_travelling_approver approver
+        left join tb_emp te
+        on approver.emp_id = te.emp_id
+        left join tb_approver_state tas
+        on approver.state = tas.state_id
+        where approver.travelling_id = #{id}
+    </select>
+    <insert id="insertTravellingApprover" parameterType="com.aaa.pojo.finance.TbTravellingApprover">
+        insert into tb_travelling_approver(travelling_id, emp_id)
+        values (#{travellingId},#{empId})
+    </insert>
+
+    <update id="updateApproverState" parameterType="com.aaa.pojo.finance.TbTravellingApprover">
+        update tb_travelling_approver
+        set state = 2
+        <if test="remark != null">
+            ,remark = #{remark}
+        </if>
+        where travelling_id = #{travellingId}
+        and emp_id = #{empId}
+    </update>
+</mapper>

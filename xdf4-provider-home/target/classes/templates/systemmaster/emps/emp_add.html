@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <label class="layui-form-label">员工姓名</label>
+            <div class="layui-inline">
+                <input id="emp_id" type="hidden" name="emp_id" placeholder="部门ID" autocomplete="off" class="layui-input">
+                <input id="emp_name" type="text" name="emp_name" required lay-verify="required" placeholder="员工姓名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">员工编号</label>
+                    <div class="layui-inline">
+                        <input type="text" id="emp_no" name="emp_no" required  lay-verify="required" placeholder="请输入员工编号" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">登录密码</label>
+                    <div class="layui-inline">
+                        <input type="password" id="pwd" name="pwd" placeholder="请输入员工密码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">任职岗位</label>
+                    <div class="layui-input-block">
+                        <select name="role_id" lay-filter="role_id" id="role_id" lay-verify="required" lay-search>
+
+                        </select>
+                    </div><a style="float: right" href="javascript:;" data-method="confirmTrans">须知：部门跟随岗位角色调动</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

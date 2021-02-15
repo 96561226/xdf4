@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>采购列表</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<!--防止图片一半显示-->
+<style rel="stylesheet">
+    .layui-table-cell{
+        text-align:center;
+        height: auto;
+        white-space: normal;
+    }
+    .layui-table img{
+        max-width:100%;
+    }
+    .layui-table-cell .layui-form-checkbox [lay-skin="primary"]{
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+<body>
+<!--表头的操作-->
+<script type="text/html" id="headBar">
+    <a class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-circle" style="color:red;"></i>申请物品采购</a>
+</script>
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="sp">采购审批</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="ch">撤回申请</a></br>
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="qr">已采购确认</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="tj">添加为资产</a>
+</script>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+<div th:replace="conference/proper/purchase_search::search"></div>
+<!--表格-->
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+<!--弹框区-->
+<div th:replace="conference/proper/purchaseAdd::purchse_SQ"></div>
+<div th:replace="conference/proper/purchaseAdd::purchse_SP"></div>
+<!--函数区-->
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','transfer','form','laydate'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        //初始化日期控件
+        var laydate = layui.laydate;
+        var transfer = layui.transfer;
+
+
+        var layerId; //用来保存弹出层的id
+        laydate.render({
+            elem: '#purchaseBuytime' //指定元素
+            ,type: 'datetime'
+        });
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 1){
+                    return '必填选项不能为空';
+                }
+            }
+            ,csk: function(value){
+                var action_emps = new Array();
+                $.each(transfer.getData('action_emps'),function(i,v){
+                    action_emps[i]=v.value;
+                });
+                if (action_emps==''){
+                    return '至少选择一个审批人';
+                }
+            }
+        });
+        //初始赋值
+        laydate.render({
+            elem: '#purchaseCreateTime',// input里时间的Id
+            format: 'yyyy-MM-dd HH:mm:ss',
+            value: new Date()
+        });
+
+        //渲染表格
+        var tableIndex = table.render({
+            elem: '#demo'
+            ,id:'demo'
+            ,height: 610
+            ,url: '[[@{/property/purList}]]' //数据接口
+            ,toolbar:'#headBar'
+            ,text:{none:'暂无相关数据'}
+            ,page: true //开启分页
+            ,limit:5
+            ,limits:[5,10,15,20,25,30]
+            ,cols: [
+                [
+                    ,{field:'purchaseId', title:'资产id',hide:true}
+                    ,{field:'purchaseNo',title:'采购编号'}
+                    ,{field:'purchaseName', title:'资产名称'}
+                    ,{field:'purchaseBuytime', title:'资产购买时间'}
+                    ,{field:'purchaseManufacturer', title:'资产供应商'}
+                    ,{field:'purchaseUnivalence', title:'资产价值',
+                        templet:"<div>{{d.purchaseUnivalence}}元</div>"
+                    }
+                    ,{field:' purchaseState', title:'可否借用',
+                        templet:function (d) {
+                            var rolestr=""
+                            var ary=d.purchaseState
+                            if(ary=="1"){
+                                var rolestr="可借用"
+                            }else {
+                                var rolestr="不可借用"
+                            }
+                            return rolestr;
+                        }
+                     }
+
+                    ,{field:'purchasePlace', title:'暂存地点',
+                        templet:function (d) {
+                            var rolestr=""
+                            if(d.purchasePlace==null||d.purchasePlace==""){
+                                rolestr="集中储备室";
+                            }else {
+                                rolestr=d.purchasePlace;
+                            }
+                            return rolestr;
+                        }
+                     }
+                    ,{field:'typeId', title:'物品类型',hide:true}
+                    ,{field:'purchaseCreateTime', title:'审批创建时间'}
+                    ,{field:'empId', title:'申请人id',hide:true}
+                    ,{field:'empName', title:'申请人'}
+                    ,{field:'remark', title:'备注'}
+                    ,{field:'state', title:'状态'
+                        ,templet: function(d){
+                            var rolestr = "";
+                            var ary = d.state;
+                            // 1为审批中 2 申请失败  3采购中  4 采购完成  5已添加 6.撤回
+                            switch (ary) {
+                                case 1: rolestr="审批中"; break;
+                                case 2: rolestr="不通过"; break;
+                                case 3: rolestr="采购中"; break;
+                                case 4: rolestr="采购完成"; break;
+                                case 5: rolestr="已添加"; break;
+                                case 6: rolestr="申请已撤回"; break;
+                            }
+                            return rolestr;
+                        }
+                    }
+                    ,{field:'tbPurchaseApprovers', title:'审批人',width:200,templet:
+                        function(d){
+                            var rolestr = "";
+                            var ary = d.tbPurchaseApprovers;
+                            ary.forEach(function(item,index){
+                                rolestr += " "+item.empName
+                                switch (item.state) {
+                                    case 1: rolestr+=" 状态:未处理 </br>"; break;
+                                    case 2: rolestr+=" 状态:已退回 </br>"; break;
+                                    case 3: rolestr+=" 状态:已同意 </br>"; break;
+                                }
+
+                            });
+                            return rolestr;
+                        }
+                    }
+                    ,{toolbar: '#barDemo',fixed:'right',width:200,title:'操作',align:'center'}
+                ]
+            ]
+            ,done: function () {
+                $("[data-field='purchaseId']").css('display','none');
+                $("[data-field='typeId']").css('display','none');
+                $("[data-field='empId']").css('display','none');
+            }
+        });
+       //刷新多条件查询
+        function refresh(){
+            var purchaseNo = $("#spurchaseNo").val();
+            var typeId = $("#stypeId").val();
+            var stateId = $("#sstateId").val();
+            var purchaseState = $("#spurchaseState").val();
+            tableIndex.reload(//重载，where后面设置的是传给后台的参数
+                {
+                    where:{
+                        purchaseNo:purchaseNo,
+                        typeId:typeId,
+                        state:stateId,
+                        purchaseState:purchaseState
+                    }
+                    ,page:{
+                        page:1,
+                        limit:5
+                    }
+                    ,url:'[[@{/property/purList}]]'
+                    ,method:'get'
+                });
+        }
+        $("#doSearch").click(function(){
+            refresh();
+        });
+
+        //每行的操作
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "sp"){
+                $.ajax({
+                    url:'[[@{/Conferenceroom/yanzheng}]]',
+                    async: false,
+                    type:'GET',
+                    dateType:'json',
+                    success:function(res){
+                        if (row.state!=1){
+                            layer.msg("改申请已审批,无法继续审批");
+                            return;
+                        }
+                        var pd=0;
+                        $.each(row.tbPurchaseApprovers,function(i,v){//判断当前登录人是否在审批人列表上
+                            if (v.empNo==res){
+                                pd=1;
+                                return;
+                            }
+                        });
+                        if (pd==1){
+                            approval(row);
+                        }else {
+                            layer.msg("您没有权限对该申请进行审批");
+                        }
+                    }
+                });
+            }else if(layEvent == "qr"){
+                $.ajax({
+                    url:'[[@{/Conferenceroom/getid}]]',
+                    async: false,
+                    type:'GET',
+                    dataType:'json',
+                    success:function(res){
+                        if(row.state==3){
+                            if (row.empId==res){
+                                var choice=confirm("您确认物品已采购？", function() { }, null);
+                                if (choice==true){
+                                    $.ajax({
+                                        url:'[[@{/property/PurchaseCG}]]',
+                                        data:{state:4,purchaseId:row.purchaseId},
+                                        async: false,
+                                        type:'POST',
+                                        dataType:'json',
+                                        success:function(res){
+                                            if (res.code=="0"){
+                                                layer.msg(res.message);
+                                                refresh();
+                                            }else{
+                                                layer.msg(res.message);
+                                            }
+                                        }
+                                    });
+                                }
+                            }else {
+                                layer.msg("这不是您负责采购的物品！");
+                            }
+                        }else {
+                            layer.msg("该物品正在审批或已经采购完成，请认真检查!");
+                        }
+                    }
+                });
+            }else if(layEvent =="tj"){
+                $.ajax({
+                    url:'[[@{/property/yanzheng}]]',
+                    async: false,
+                    type:'GET',
+                    dataType:'json',
+                    success:function(res){
+                        if(row.state==4){
+                            if (res.code=="0"){
+                                var choice=confirm("您确认添加物品？", function() { }, null);
+                                if (choice==true){
+                                    $.ajax({
+                                        url:'[[@{/property/PurchaseTJ}]]',
+                                        data:row,
+                                        async: false,
+                                        type:'POST',
+                                        dataType:'json',
+                                        success:function(res){
+                                            if (res.code=="0"){
+                                                layer.msg(res.message);
+                                                refresh();
+                                            }else{
+                                                layer.msg(res.message);
+                                            }
+                                        }
+                                    });
+                                }
+                            }else{
+                                layer.msg(res.message);
+                            }
+                        }else {
+                            layer.msg("该物品已添加或未采购完成,请认真检查！");
+                        }
+                    }
+                });
+            }else if(layEvent =="ch"){
+                $.ajax({
+                    url:'[[@{/Conferenceroom/getid}]]',
+                    async: false,
+                    type:'GET',
+                    dataType:'json',
+                    success:function(res){
+                        if(row.state==1){
+                            if (row.empId==res){
+                                var choice=confirm("您确认撤销该申请？", function() { }, null);
+                                if (choice==true){
+                                    $.ajax({
+                                        url:'[[@{/property/PurchaseCG}]]',
+                                        data:{state:6,purchaseId:row.purchaseId},
+                                        async: false,
+                                        type:'POST',
+                                        dataType:'json',
+                                        success:function(res){
+                                            if (res.code=="0"){
+                                                layer.msg(res.message);
+                                                refresh();
+                                            }else{
+                                                layer.msg(res.message);
+                                            }
+                                        }
+                                    });
+                                }
+                            }else {
+                                layer.msg("这不是您负责采购的物品！");
+                            }
+                        }else {
+                            layer.msg("该物品已审核完成不能撤回!");
+                        }
+                    }
+                });
+            }
+        });
+
+        //表头的操作
+        table.on('toolbar(demo)',function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            var layEvent = obj.event;
+            var rows = checkStatus.data;//获取选中行的数据
+            if(layEvent == "add"){
+                loademps();
+                layerId = layer.open({
+                    type: 1
+                    ,title:'设备添加'
+                    ,id: 'layerDemo'+Math.random() //防止重复弹出
+                    ,content: $('#purchseSQ')
+                    ,shade: [0.8, '#393D49']
+                    ,area:['1000px','800px'],
+                    success:function(index){
+                        //添加执行
+                        form.on('submit(purchseDemo)', function(data){
+                            //获取表单区域所有值
+                            var data1 = form.val("purchseFrm");
+                            var action_emps = new Array();
+                            $.each(transfer.getData('action_emps'),function(i,v){
+                                action_emps[i]=v.value;
+                            });
+                           $.ajax({
+                                url:'[[@{/property/PurchaseSQ}]]',
+                                data:{
+                                    purchaseNo:data1.purchaseNo,
+                                    purchaseName:data1.purchaseName,
+                                    purchaseManufacturer:data1.purchaseManufacturer,
+                                    purchaseUnivalence:data1.purchaseUnivalence,
+                                    purchasePlace:data1.purchasePlace,
+                                    purchaseState:data1.purchaseState,
+                                    typeId:data1.typeId,
+                                    purchaseCreateTime:data1.purchaseCreateTime,
+                                    empId:data1.empId,
+                                    remark:data1.remark,
+                                    empids:action_emps
+                                },
+                                type:'POST',
+                                traditional: true,
+                                dataType:'json',
+                                success:function(res){
+                                    if(res.code == '0'){
+                                        layer.msg(res.message);
+                                        $("#purchseFrm")[0].reset();//清空表单数据
+                                        layer.close(layerId);
+                                        window.location.reload();
+                                    }else{
+                                        layer.msg(res.message);
+                                    }
+
+                                }
+                            });
+                            return false;
+                        });
+                    }
+                });
+            };
+        });
+        //初始化穿梭框
+        function loademps(){
+            $.ajax({
+                url: '[[@{/consumer/emps/selectSeaEmp}]]',
+                type: 'GET',
+                dateType: 'json',
+                success: function (res) {
+                    //显示搜索框
+                    transfer.render({
+                        elem: '#action_emp_ids'
+                        ,data: res
+                        ,id:'action_emps'
+                        ,title: ['可选员工', '已选员工']
+                        ,showSearch: true
+                        ,width:250 //定义宽度
+                        ,height: 210
+                        ,parseData: function(res){
+                            return {
+                                "value": res.emp_id //数据值
+                                ,"title": res.emp_name //数据标题
+                                ,"disabled": res.disabled  //是否禁用
+                                ,"checked": res.checked //是否选中
+                            }
+                        }
+                    })
+                }
+            })
+        }
+        //审批
+        function approval(row){
+            layerId = layer.open({
+                type: 1
+                ,title:'采购审批'
+                ,id: 'layerDemo'+Math.random() //防止重复弹出
+                ,content: $('#purchseSP')
+                ,shade: [0.8, '#393D49']
+                ,area:['600px','800px'],
+                success:function(index){
+                    $("#purchseSPFrm")[0].reset();//清空表单数据
+                    //设置最初的值
+                    var purchaseState=function(){
+                        if (row.purchaseState==1){
+                            return "可借用";
+                        }else {
+                            return "不可借用";
+                        }
+                    }
+                    //给表单赋值
+                    form.val("purchseSPFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                        "sppurchaseId": row.purchaseId // "name": "value"
+                        ,"sppurchaseNo": row.purchaseNo
+                        ,"sppurchaseName": row.purchaseName
+                        ,"sppurchaseManufacturer": row.purchaseManufacturer
+                        ,"sppurchaseUnivalence": row.purchaseUnivalence
+                        ,"sppurchaseState": row.purchaseState
+                        ,"sppurchaseStateName": purchaseState
+                        ,"sppurchasePlace": row.purchasePlace
+                        ,"spempId":row.empId
+                        ,"spempName":row.empName
+                        ,"spremark": row.remark
+                    });
+                    form.render();
+                    //先获取当前id
+                    var empId=null;
+                    $.ajax({
+                        url:'[[@{/Conferenceroom/getid}]]',
+                        async: false,
+                        type:'GET',
+                        dateType:'json',
+                        success:function(res){
+                            empId=res;
+                        }
+                    });
+                    //同意修改
+                    form.on('submit(forOK)', function(data){
+                        //获取表单区域所有值
+                        var sppurchaseId = $("#sppurchaseId").val();
+                        var myremark = $("#myremark").val();
+                        $.ajax({
+                            url:'[[@{/property/PurchaseSP}]]',
+                            data:{
+                                purchaseId:sppurchaseId,
+                                empId:empId,
+                                remark:myremark,
+                                state:3
+                            },
+                            type:'POST',
+                            dataType:'json',
+                            success:function(res){
+                                if(res.code=="0"){
+                                    layer.msg(res.message);
+                                    $("#purchseSPFrm")[0].reset();//清空表单数据
+                                    layer.close(layerId);
+                                    refresh();
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                        return false;
+                    });
+                    //退回修改
+                    form.on('submit(forNO)', function(data){
+                        //获取表单区域所有值
+                        var sppurchaseId = $("#sppurchaseId").val();
+                        var myremark = $("#myremark").val();
+                        $.ajax({
+                            url:'[[@{/property/PurchaseSP}]]',
+                            data:{
+                                purchaseId:sppurchaseId,
+                                empId:empId,
+                                remark:myremark,
+                                state:2
+                            },
+                            type:'POST',
+                            dataType:'json',
+                            success:function(res){
+                                if(res.code=="0"){
+                                    layer.msg(res.message);
+                                    $("#purchseSPFrm")[0].reset();//清空表单数据
+                                    layer.close(layerId);
+                                    refresh();
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                        return false;
+                    });
+                }
+            });
+        }
+    });
+
+    $(document).ready(function(){
+        //初始调用
+        $.ajax({
+            url:'[[@{/property/selTypeAndState}]]',
+            async: false,
+            type:'GET',
+            dataType:'json',
+            success:function(res){
+                if (res.code=='0'){
+                    var type = "";
+                    var state = "";
+                    $.each(res.data[0],function(i,v){
+                        type += "<option value='"+v.typeId+"'>"+v.typeName+"</option>";
+                    });
+                    $.each(res.data[1],function(i,v){
+                        state += "<option value='"+v.stateId+"'>"+v.stateName+"</option>";
+                    });
+                    $("#stypeId").append(type);
+                    $("#typeId").append(type);
+                }
+            }
+        });
+        $.ajax({
+            url:'[[@{/Conferenceroom/getid}]]',
+            async: false,
+            type:'GET',
+            dataType:'json',
+            success:function(res){
+                $("#empId").val(res);
+            }
+        });
+        $.ajax({
+            url:'[[@{/property/ApproverNO}]]',
+            async: false,
+            type:'GET',
+            dataType:'json',
+            success:function(res){
+                $("#purchaseNo").val(res[0]);
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

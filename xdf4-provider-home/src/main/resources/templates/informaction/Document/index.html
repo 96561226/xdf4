@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>显示所有的文档信息</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+<div th:replace="informaction/Document/document_search::search"></div>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+
+
+<!--表头的操作-->
+<script type="text/html" id="headBar">
+    <a class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-circle" style="color:red;"></i>添加</a>
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="delAll"><i class="layui-icon layui-icon-delete" style="color:yellow;"></i>批量删除</a>
+</script>
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="file">预览文档</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit" style="color:pink;"></i>编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<!--添加和修改的弹出层-->
+<div th:replace="informaction/Document/addOrSave::addOrUpdate"></div>
+<div th:replace="informaction/Document/detail::detail_common"></div>
+<script type="text/javascript">
+layui.use(['table','jquery','layer','upload','form','laydate'],function(){
+    var $ = layui.jquery;
+    var table = layui.table;
+    var layer = layui.layer;
+    var upload = layui.upload;
+    var form = layui.form;
+    //初始化日期控件
+    var laydate = layui.laydate;
+
+    // 执行一个laydate实例
+    laydate.render({
+        elem: '#updatetime',//指定元素
+        min: 0,
+        max:0
+    });
+
+    var layerId; //用来保存弹出层的id
+    //渲染表格
+    var tableIndex = table.render({
+        elem: '#demo'
+        ,id:'demo'
+        ,height: 400
+        ,url: '[[@{/document/Documents}]]' //数据接口
+        ,toolbar:'#headBar'
+        ,text:{none:'暂无相关数据'}
+        ,page: true //开启分页
+        ,limit:3
+        ,limits:[3,6,9,12,15,18]
+        ,cols: [
+            [
+            {type:'checkbox'}
+            ,{field:'dname', title:'文档名称'}
+            ,{field:'versions', title:'版本号'}
+            ,{field:'accessory', title:'文档相关信息'}
+            ,{field:'author', title:'作者'}
+            ,{field:'updatetime', title:'更新时间'}
+            ,{toolbar: '#barDemo',fixed:'right',title:'操作',width:250,align:'center'}
+        ]
+        ]
+
+    });
+    //表头的操作
+    table.on('toolbar(demo)',function(obj){
+
+        var checkStatus = table.checkStatus(obj.config.id);
+        var layEvent = obj.event;
+        var rows = checkStatus.data;//获取选中行的数据
+        if(layEvent == "add"){
+            add();
+
+        }else if(layEvent == "delAll"){
+            if(rows.length == 0){
+                layer.alert('必须选中行才可以删除！');
+                return;
+            }
+            if(confirm("确定要删除吗")){
+                      var ids = new Array();
+                      $.each(rows,function(i,d){
+                          ids[i] = d.id;
+                      });
+                      delAll(ids);
+            }
+        }
+
+    });
+    //每行的操作
+    table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+
+        var row = obj.data;//获取每行的数据
+        var layEvent =obj.event;//获取事件
+        if(layEvent == "detail"){
+            layIndex = layer.open({
+                type:1
+                ,content:$("#detail")
+                ,shade: [0.8, '#393D49']
+                ,area:['500px','400px']
+                ,success:function(){
+                    console.log(row);
+                    $("#did").val(row.id);
+                    $("#ddname").val(row.dname);
+                    $("#dversions").val(row.versions);
+                    $("#daccessory").val(row.accessory);
+                    $("#dauthor").val(row.author);
+                    $("#dupdatetime").val(row.updatetime);
+                }
+            });
+
+        }else if(layEvent == "edit"){
+            update(row);
+
+        }else if(layEvent == "del"){
+            if(confirm("确定要删除吗？")){
+                var id = row.id;
+                del(id);
+            }
+        }else if(layEvent == "file"){
+            if(row.filename!=null){
+                openFile(row);
+            }else{
+                layer.msg("暂无文档可以预览");
+            }
+
+        }
+    });
+
+    //预览文件
+    function openFile(row){
+        layer.open({
+            type:2,
+            shade: [0.8, '#393D49'],
+            area:['80%','80%'],
+            content:'/upimg/'+row.filename+''
+        });
+    }
+
+    //删除的异步操作
+    function del(id) {
+        $.ajax({
+            url:'[[@{/document/del}]]',
+            data:{_method:'DELETE',id:id},
+            type:'POST',
+            dataType:'json',
+            success:function(result){
+                window.location.reload();
+            }
+        });
+    }
+    //批量删除的异步操作
+    function delAll(ids){
+        $.ajax({
+            url:'[[@{/document/delAll}]]',
+            data:{_method:'DELETE',ids:ids},
+            type:'POST',
+            dataType:'json',
+            success:function(result){
+                window.location.reload();
+            }
+
+        });
+    }
+    //加载下拉列表框
+     $.ajax({
+         url:'[[@{/document/depts}]]',
+         type:'GET',
+         dateType:'json',
+         success:function(res){
+             var content = "";
+             $.each(res,function(i,v){
+                 content += "<option value='"+v.dept_id+"'>"+v.dept_name+"</option>";
+             });
+             $("#dept_id").append(content);
+             $("#sdept_id").append(content);
+             form.render('select','dataFrm');
+             form.render('select','searchFrm');
+         }
+     });
+    $.ajax({
+        url:'[[@{/document/types}]]',
+        type:'GET',
+        dateType:'json',
+        success:function(res){
+            var content = "";
+            $.each(res,function(i,v){
+                content += "<option value='"+v.type_id+"'>"+v.type_name+"</option>";
+            });
+            $("#type_id").append(content);
+            $("#stype_id").append(content);
+            form.render('select','dataFrm');
+            form.render('select','searchFrm');
+        }
+    });
+
+    //添加的操作
+    function add(){
+        layerId = layer.open({
+            type: 1
+            ,title:'添加文档'
+            ,id: 'layerDemo'+Math.random() //防止重复弹出
+            ,content: $('#saveOrUpdateDiv')
+            ,shade: [0.8, '#393D49']
+            ,area:['500px','400px'],
+            success:function(index){
+                $("#dataFrm")[0].reset();//清空表单数据updemo
+                $("#updemo").remove();
+                //添加执行
+                form.on('submit(formDemo)', function(data){
+                    //获取表单区域所有值
+                    var data1 = form.val("dataFrm");
+                    $.ajax({
+                        url:'[[@{/document/doAdd}]]',
+                        data:data1,
+                        type:'POST',
+                        dataType:'json',
+                        success:function(res){
+                            console.log("===============")
+                            console.log(res);
+                            if(res.result == 'success'){
+                                layer.msg("添加成功");
+                            }else{
+                                layer.msg("添加失败");
+                            }
+                            layer.close(layerId);
+                            $("#dataFrm")[0].reset();//清空表单数据
+                            $('#demo1').attr('src', "");
+                            window.location.reload();
+                        }
+                    });
+                    return false;
+                });
+            }
+        });
+    }
+    //修改操作
+    function update(row){
+        layerId = layer.open({
+            type: 1
+            ,title:'修改文档'
+            ,id: 'layerDemo'+Math.random() //防止重复弹出
+            ,content: $('#saveOrUpdateDiv')
+            ,shade: [0.8, '#393D49']
+            ,area:['500px','400px'],
+            success:function(index){
+                $("#dataFrm")[0].reset();//清空表单数据
+                //设置最初的值
+                //给表单赋值
+                console.log(row.updatetime);
+                form.val("dataFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                    "id": row.id // "name": "value"
+                    ,"dname": row.dname
+                    ,"filename": row.filename
+                    ,"versions": row.versions
+                    ,"author": row.author
+                    ,"type_id":row.type.type_id
+                    ,"keyword": row.keyword
+                    ,"dept_id":row.dept.dept_id
+                    ,"project": row.project
+                    ,"accessory": row.accessory
+                    ,"updatetime": row.updatetime
+                });
+                $("#demo1").attr('src','/upimg/'+row.filename);
+                form.render();
+                //修改
+                form.on('submit(formDemo)', function(data){
+                    //获取表单区域所有值
+                    var data1 = form.val("dataFrm");
+                    $.ajax({
+                        url:'[[@{/document/doUpdate}]]',
+                        data:data1,
+                        type:'POST',
+                        dataType:'json',
+                        success:function(res){
+                            if(res.result == 'success'){
+                                layer.msg("修改成功");
+                            }else{
+                                layer.msg("修改失败");
+                            }
+                            layer.close(layerId);
+                            $("#dataFrm")[0].reset();//清空表单数据
+                            $('#demo1').attr('src', "");
+                            window.location.reload();
+                        }
+                    });
+                    return false;
+                });
+            }
+        });
+    }
+
+    //普通文档上传
+    var uploadInst = upload.render({
+        elem: '#test1'
+        ,url: '[[@{/document/doUpload}]]' //改成您自己的上传接口
+        ,accept: 'file' //普通文件
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#demo1').attr('src', result); //文档链接（base64）
+            });
+        }
+        ,done: function(res){
+            //如果上传失败
+            if(res.type !="success"){
+                return layer.msg('上传失败');
+            }
+            $("#filename").val(res.fileName);
+
+            layer.msg('上传成功！');
+        }
+        ,error: function(){
+            //演示失败状态，并实现重传
+            var demoText = $('#demoText');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function(){
+                uploadInst.upload();
+            });
+        }
+    });
+
+    //刷新多条件查询
+    function refresh(){
+        var dept_id = $("#sdept_id").val();
+        var type_id = $("#stype_id").val();
+        tableIndex.reload(//重载，where后面设置的是传给后台的参数
+            {
+                where:{
+                    dept_id:dept_id,
+                    type_id:type_id
+                }
+                ,page:{
+                    page:1,
+                    limit:3
+                }
+                ,url:'[[@{/document/Documents}]]'
+                ,method:'get'
+            });
+    }
+    $("#doSearch").click(function(){
+        refresh();
+    });
+
+
+});
+</script>
+</body>
+</html>

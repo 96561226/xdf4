@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.RolesMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.Roles">
+        <result column="role_id" jdbcType="INTEGER" property="role_id" />
+        <result column="role_name" jdbcType="VARCHAR" property="role_name" />
+        <result column="role_des" jdbcType="VARCHAR" property="role_des" />
+        <result column="role_state" jdbcType="INTEGER" property="role_state" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+    </resultMap>
+
+    <select id="selectRolesByNo" resultMap="BaseResultMap">
+        select tr.* from tb_roles tr,tb_emp e where e.role_id=tr.role_id and e.emp_no=#{empNo}
+    </select>
+
+    <select id="selectRolesByDept" resultMap="BaseResultMap">
+        select * from tb_roles where dept_id = #{dept_id}
+    </select>
+
+    <select id="selectRoles" resultMap="BaseResultMap">
+        select tr.*,td.dept_name from tb_roles tr
+        left join tb_dept td on tr.dept_id = td.dept_id
+    </select>
+
+    <select id="selectRoleById" resultMap="BaseResultMap">
+        select tr.*,td.dept_name from tb_roles tr
+        left join tb_dept td on tr.dept_id = td.dept_id
+        where role_id = #{role_id}
+    </select>
+
+    <insert id="insertRole" parameterType="com.aaa.pojo.Roles">
+        insert into tb_roles(role_name, role_des,dept_id) values (#{role_name},#{role_des},#{dept_id})
+    </insert>
+
+    <delete id="delRole">
+        delete from tb_roles where role_id = #{role_id}
+    </delete>
+
+    <update id="updRole">
+        update tb_roles
+        <set>
+            <if test="role_name!=null and role_name!='' "> role_name=#{role_name}, </if>
+            <if test="role_des!=null and role_des!='' "> role_des=#{role_des}, </if>
+            <if test="role_state!=null"> role_state=#{role_state}, </if>
+            <if test="dept_id!=null"> dept_id=#{dept_id} </if>
+        </set>
+        where role_id = #{role_id}
+    </update>
+
+
+    <resultMap id="rv" type="com.aaa.pojo.RoleVo">
+        <id column="role_id" jdbcType="INTEGER" property="role_id" />
+        <result column="role_name" jdbcType="VARCHAR" property="role_name" />
+        <result column="role_des" jdbcType="VARCHAR" property="role_des" />
+        <result column="role_state" jdbcType="INTEGER" property="role_state" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+        <collection property="transactions" ofType="com.aaa.pojo.Transaction" column="role_id" select="com.aaa.mapper.TransactionMapper.selectByRoleId">
+            <id property="transaction_id" column="transaction_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectRVAll" resultMap="rv">
+        select tr.*,td.dept_name from tb_roles tr
+        left join tb_dept td on tr.dept_id = td.dept_id
+    </select>
+
+    <select id="selectRVById" resultMap="rv">
+        select tr.*,td.dept_name from tb_roles tr
+        left join tb_dept td on tr.dept_id = td.dept_id
+        where tr.role_id=#{role_id}
+    </select>
+
+    <delete id="delRoleTransaction">
+        delete from tb_transaction_role where role_id =#{role_id}
+    </delete>
+
+    <insert id="addRoleTransaction" parameterType="com.aaa.pojo.TransactionRole">
+        insert into tb_transaction_role(role_id, tid) value (#{role_id},#{tid})
+    </insert>
+
+</mapper>

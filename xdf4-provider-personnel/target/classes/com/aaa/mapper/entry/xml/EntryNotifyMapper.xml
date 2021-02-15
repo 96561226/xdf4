@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.entry.EntryNotifyMapper">
+
+    <resultMap id="tbEntryNotifyVoMap" type="com.aaa.pojo.personnel.TbEntryNotifyVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="entry_id" jdbcType="INTEGER" property="entryId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    </resultMap>
+    <select id="selectEntryNotifys" parameterType="Integer" resultMap="tbEntryNotifyVoMap">
+        select * from tb_entry_notify notify
+        left join tb_emp emp
+        on notify.emp_id = emp.emp_id
+        where notify.entry_id = #{id}
+    </select>
+    <insert id="insertEntryNotify" parameterType="com.aaa.pojo.personnel.TbEntryNotify">
+        insert into tb_entry_notify(
+            entry_id,emp_id
+        )values(
+            #{entryId},#{empId}
+        )
+    </insert>
+</mapper>

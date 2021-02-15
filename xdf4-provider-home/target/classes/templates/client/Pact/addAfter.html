@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加售后服务</title>
+</head>
+<body>
+<!--添加合同的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveAfter" th:fragment="addAfter">
+    <form class="layui-form"  id="dataAfterFrm" lay-filter="dataAfterFrm" type="post">
+        <table class="layui-table" id="tab">
+            <tr>
+                <td>*售后主题</td>
+                <td colspan="8">
+                    <input type="text" id="theme" name="theme" required lay-verify="required"  class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>客户名称</td>
+                <td colspan="2">
+                    <input id="cId" type="text" name="c_id" style="display: none;">
+                    <input id="cname" type="text" class="layui-input" readonly>
+                </td>
+                <td>合同编号</td>
+                <td colspan="2">
+                    <input type="text" id="pNo"  class="layui-input" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>合同主要信息</td>
+                <td colspan="2">
+                    【合同全名】
+                    <input id="pId" type="text" name="p_id" style="display: none;">
+                    <input type="text" id="pName"  class="layui-input" readonly>
+                    【合同所属部门】
+                    <input id="deptId" type="text" name="dept_id" style="display: none;">
+                    <input id="deptName" type="text" class="layui-input">
+                </td>
+                <td colspan="2">
+                    【合同状态】<input type="text" id="state"  class="layui-input" readonly>
+                    【签约日期】<input type="text" id="scontractDate"  class="layui-input" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>对方联系人</td>
+                <td colspan="2">
+                    <input type="text" id="ojname" name="ojname" required lay-verify="required"  class="layui-input">
+                </td>
+                <td>固定电话</td>
+                <td colspan="2">
+                    <input type="text" id="gphone" name="gphone" required lay-verify="required"  class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>移动电话</td>
+                <td colspan="2">
+                    <input type="text" id="yphone" name="yphone" required lay-verify="required"  class="layui-input">
+                </td>
+                <td>邮箱</td>
+                <td colspan="2">
+                    <input type="text" id="email" name="email" required lay-verify="required"  class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>服务类型</td>
+                <td colspan="2">
+                    <select lay-filter="role" name="typeid" id="typeid" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>服务人员</td>
+                <td colspan="2">
+                    <select lay-filter="role" name="emp_id" id="semp_id" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+
+            </tr>
+            <tr>
+                <td>开始时间</td>
+                <td colspan="2">
+                    <input type="text" id="startTime" name="startTime" required lay-verify="required"  class="layui-input">
+                </td>
+                <td>结束时间</td>
+                <td colspan="2">
+                    <input type="text" id="endTime" name="endTime" required lay-verify="required"  class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>服务内容</td>
+                <td colspan="8">
+                    <textarea id="content" name="content" placeholder="请输入服务内容" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>客户反馈</td>
+                <td colspan="8">
+                    <textarea id="feedback" name="feedback" placeholder="请输入客户反馈内容" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+        </table>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

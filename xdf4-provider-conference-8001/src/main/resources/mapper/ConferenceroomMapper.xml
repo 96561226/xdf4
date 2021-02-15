@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.ConferenceroomMapper">
+    <!--查询会议室的基本消息的mapper-->
+    <resultMap id="conferenceroomVoMap" type="com.aaa.pojo.conference.ConferenceroomVo">
+        <result column="conferenceRoom_id" jdbcType="BIGINT" property="conferenceRoomId" />
+        <result column="conferenceRoom_no" jdbcType="VARCHAR" property="conferenceRoomNo" />
+        <result column="conferenceRoom_name" jdbcType="VARCHAR" property="conferenceRoomName" />
+        <result column="conferenceRoom_pic" jdbcType="VARCHAR" property="conferenceRoomPic" />
+        <result column="state" jdbcType="BIGINT" property="state" />
+        <collection column="propertyId" property="propertys"  ofType="com.aaa.pojo.conference.TbProperty">
+            <id column="property_id" jdbcType="BIGINT" property="propertyId" ></id>
+            <result column="property_no" jdbcType="VARCHAR" property="propertyNo" />
+            <result column="property_name" jdbcType="VARCHAR" property="propertyName" />
+        </collection>
+    </resultMap>
+    <!--查询会议室的基本消息-->
+    <select id="selConferenceRoomsByDT" resultMap="conferenceroomVoMap" parameterType="com.aaa.pojo.conference.TbConferenceroom">
+        select cr.conferenceRoom_id,cr.conferenceRoom_no,cr.conferenceRoom_name,cr.conferenceRoom_pic,cr.state,cc.property_id,cc.property_no,cc.property_name
+        FROM
+        tb_conferenceRoom cr
+        left JOIN
+        (
+        SELECT  cp.conferenceRoom_id,p.property_id,p.property_no,p.property_name
+        FROM tb_conferenceRoom_property cp,tb_property p
+        WHERE cp.property_id=p.property_id
+        ) cc
+        ON cc.conferenceRoom_id=cr.conferenceRoom_id
+        <trim prefix="HAVING" prefixOverrides="and">
+            <if test="conferenceRoomNo!=null">conferenceRoom_no like "%"#{conferenceRoomNo}"%"</if>
+            <if test="conferenceRoomName!=null">conferenceRoom_name like "%"#{conferenceRoomName}"%"</if>
+            <if test="state!=null">state=#{state}</if>
+        </trim>
+    </select>
+    <resultMap id="tbConferenceroomMap" type="com.aaa.pojo.conference.TbConferenceroom">
+        <result column="conferenceRoom_id" jdbcType="BIGINT" property="conferenceRoomId" />
+        <result column="conferenceRoom_no" jdbcType="VARCHAR" property="conferenceRoomNo" />
+        <result column="conferenceRoom_name" jdbcType="VARCHAR" property="conferenceRoomName" />
+        <result column="conferenceRoom_pic" jdbcType="VARCHAR" property="conferenceRoomPic" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+    </resultMap>
+    <select id="selTbConferenceroom" resultMap="tbConferenceroomMap">
+        select * from tb_conferenceroom;
+    </select>
+</mapper>    

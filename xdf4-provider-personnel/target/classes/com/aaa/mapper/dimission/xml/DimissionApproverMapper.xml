@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.dimission.DimissionApproverMapper">
+
+    <resultMap id="tbDimissionApproverVoMap" type="com.aaa.pojo.personnel.TbDimissionApproverVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="dimission_id" jdbcType="INTEGER" property="dimissionId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <select id="selectDimissionApprovers" parameterType="Long" resultMap="tbDimissionApproverVoMap">
+         select approver.*,emp.emp_name,tas.state_name from tb_dimission_approver approver
+         left join tb_emp emp
+         on approver.emp_id = emp.emp_id
+         left join tb_approver_state tas
+         on approver.state = tas.state_id
+         where approver.dimission_id = #{id}
+    </select>
+    <insert id="insertDimissionApprover" parameterType="com.aaa.pojo.personnel.TbDimissionApprover">
+        insert into tb_dimission_approver(dimission_id,emp_id)values(#{dimissionId},#{empId})
+    </insert>
+
+    <update id="updateState" parameterType="com.aaa.pojo.personnel.TbDimissionApprover">
+        update tb_dimission_approver
+        set state = 2
+        where dimission_id = #{dimissionId}
+        and emp_id = #{empId}
+    </update>
+</mapper>

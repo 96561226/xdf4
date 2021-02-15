@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登记项目</title>
+</head>
+<body>
+<!--添加弹出层-->
+<div style="display: none;padding: 20px;" id="projectTJ" th:fragment="project_TJ">
+    <id class="layui-form-item">
+        <h3>项目登记</h3>
+        <h5 style="color:red;">*1.注意该页面为项目登记,登记前请先准备好相关手续（任务，文档，项目资金等）</h5>
+        <h5 style="color:red;">*2.注意项目负责人为当前登录的角色</h5>
+        <h5 style="color:red;">*2.*为必填选项</h5>
+    </id>
+    <form class="layui-form"  id="projectFrm" lay-filter="projectFrm" type="post">
+        <div class="layui-form-item">
+            <label class="layui-form-label">*申请编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="projectNo" name="projectNo" lay-verify="title" autocomplete="off"  class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">项目负责人</label>
+            <div class="layui-input-block">
+                <input type="text" id="empId" name="empId" lay-verify="title" autocomplete="off"  class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">*项目名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="projectName" name="projectName" lay-verify="title" autocomplete="off" placeholder="xx公司-xx项目" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">*项目投资金额</label>
+            <div class="layui-input-block">
+                <input type="number" min="0" id="projectPredictMoney" name="projectPredictMoney" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">项目已花费金额</label>
+            <div class="layui-input-block">
+                <input type="number" min="0" id="projectUseMoney" name="projectUseMoney" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-inline">*项目开始时间</label>
+            <div class="layui-inline">
+                <input type="text" class="layui-input" id="projectBeginTime" name="projectBeginTime" lay-verify="title" placeholder="yyyy-MM-dd">
+            </div>
+            <label class="layui-inline">项目结束时间</label>
+            <div class="layui-inline">
+                <input type="text" class="layui-input" id="projectEndTime" name="projectEndTime" lay-verify="endTime" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">*项目详解</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="projectRemark" name="projectRemark" class="layui-textarea" lay-verify="title"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">*项目状态</label>
+            <div class="layui-input-block">
+                <select id="projectState" name="projectState" lay-filter="aihao" lay-verify="title">
+                    <option value="">请选择</option>
+                    <option value="1">实施中</option>
+                    <option value="2">已完成</option>
+                    <option value="3">已废弃</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">*项目类型</label>
+            <div class="layui-input-block">
+                <select id="projectType" name="projectType" lay-filter="aihao" lay-verify="title">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">*项目文档</label>
+            <div class="layui-input-block">
+                <select id="documentId" name="documentId" lay-filter="aihao" lay-verify="title">
+                    <option value="">请先创建</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">*项目任务</label>
+            <div class="layui-input-block">
+                <select id="taskId" name="taskId" lay-filter="aihao" lay-verify="title">
+                    <option value="">请先创建</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="projectDemo" id="bt1">立即提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

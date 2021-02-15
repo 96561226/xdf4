@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PurchaseMapper">
+    <resultMap id="purchaseVoMap" type="com.aaa.pojo.conference.PurchaseVo">
+        <result column="purchase_id" jdbcType="BIGINT" property="purchaseId" />
+        <result column="purchase_no" jdbcType="VARCHAR" property="purchaseNo" />
+        <result column="purchase_name" jdbcType="VARCHAR" property="purchaseName" />
+        <result column="purchase_buytime" jdbcType="DATE" property="purchaseBuytime" />
+        <result column="purchase_manufacturer" jdbcType="VARCHAR" property="purchaseManufacturer" />
+        <result column="purchase_univalence" jdbcType="INTEGER" property="purchaseUnivalence" />
+        <result column="purchase_place" jdbcType="VARCHAR" property="purchasePlace" />
+        <result column="purchase_state" jdbcType="INTEGER" property="purchaseState" />
+        <result column="type_id" jdbcType="BIGINT" property="typeId" />
+        <result column="purchase_createTime" jdbcType="TIMESTAMP" property="purchaseCreateTime" />
+        <result column="emp_id" jdbcType="BIGINT" property="empId" />
+        <result column="emp_no" jdbcType="VARCHAR" property="empNo" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <collection column="purchase_id" ofType="com.aaa.pojo.conference.PurchaseApproverVo" property="tbPurchaseApprovers" select="com.aaa.springcloud.mapper.PurchaseApproverMapper.selPurchaseApproverAll">
+            <result column="id" jdbcType="BIGINT" property="id" />
+            <result column="did" jdbcType="BIGINT" property="empId" />
+            <result column="dno" jdbcType="VARCHAR" property="empNo" />
+            <result column="dname" jdbcType="VARCHAR" property="empName" />
+            <result column="dremark" jdbcType="VARCHAR" property="remark" />
+            <result column="dstate" jdbcType="INTEGER" property="state" />
+        </collection>
+    </resultMap>
+    <select id="selPurchaseDT" resultMap="purchaseVoMap" parameterType="com.aaa.pojo.conference.PurchaseVo">
+        SELECT pu.*,emp.emp_no,emp.emp_name
+        FROM tb_purchase pu
+        INNER JOIN tb_emp emp on pu.emp_id=emp.emp_id
+        <if test="ymID!=null and ymID!=''">LEFT JOIN tb_purchase_approver pa ON pa.purchase_id=pu.purchase_id</if>
+        <trim prefix="where" prefixOverrides="and">
+            <if test="purchaseId!=null and purchaseId!=''">and pu.purchase_id=#{purchaseId}</if>
+            <if test="purchaseNo!=null and purchaseNo!=''">and pu.purchase_no=#{purchaseNo}</if>
+            <if test="purchaseName!=null and purchaseName!=''">and pu.purchase_name=#{purchaseName}</if>
+            <if test="purchaseBuytime!=null">and pu.purchase_buytime=#{purchaseBuytime}</if>
+            <if test="purchaseState!=null and purchaseState!=''">and pu.purchase_state=#{purchaseState}</if>
+            <if test="typeId!=null and typeId!=''">and pu.type_id=#{typeId}</if>
+            <if test="empId!=null and empId!=''">and pu.emp_id=#{empId}</if>
+            <if test="state!=null and state!=''">and pu.state=#{state}</if>
+        </trim>
+        <if test="ymID!=null and ymID!=''">GROUP BY purchase_id</if>
+        order by pu.purchase_id desc
+    </select>
+    <update id="updPurchase">
+        UPDATE tb_purchase SET state=#{state}<if test="purchaseBuytime!=null">,purchase_buytime=#{purchaseBuytime}</if> WHERE purchase_id=#{purchaseId}
+    </update>
+    <insert id="addPurchase" parameterType="com.aaa.pojo.conference.TbPurchase">
+        INSERT INTO tb_purchase
+        (purchase_no,purchase_name,purchase_manufacturer,purchase_univalence,purchase_place,purchase_state,type_id,purchase_createTime,emp_id,remark,state)
+        VALUES
+        (#{purchaseNo},#{purchaseName},#{purchaseManufacturer},#{purchaseUnivalence},#{purchasePlace},#{purchaseState},#{typeId},#{purchaseCreateTime},#{empId},#{remark},#{state})
+    </insert>
+</mapper>    

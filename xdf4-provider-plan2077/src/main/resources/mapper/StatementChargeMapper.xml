@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.StatementChargeMapper">
+    <insert id="insertStatementCharge" parameterType="com.aaa.pojo.plans.TbStatementCharge">
+        insert into tb_statement_charge (sid, charge_emp_id) values (#{sid},#{charge_emp_id})
+    </insert>
+
+    <delete id="delStatementCharge">
+        delete from tb_statement_charge where statement_cid=#{statement_cid}
+    </delete>
+
+    <update id="updStatementCharge" parameterType="com.aaa.pojo.plans.TbStatementCharge">
+        update tb_statement_charge set state=#{state} where sid=#{sid} and charge_emp_id=#{charge_emp_id}
+    </update>
+
+<!--    <select id="selStatementChargeByStatementId">
+        select * from tb_statement_charge where sid=#{statement_id}
+    </select>-->
+
+</mapper>

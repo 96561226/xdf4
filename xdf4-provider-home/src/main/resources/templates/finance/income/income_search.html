@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>申请查询</title>
+</head>
+<body>
+<form action="" class="layui-form" method="get" id="searchFrm" lay-filter="searchFrm" th:fragment="search">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">编号:</label>
+            <div class="layui-input-inline">
+                <input type="text" id="sincomeNo"  autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">登记人</label>
+            <div class="layui-input-block">
+                <select lay-filter="register" id="sregister">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">收支人</label>
+            <div class="layui-input-block">
+                <select lay-filter="emp" id="sempId">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">部门</label>
+            <div class="layui-input-block">
+                <select lay-filter="dept" id="sdeptId">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">支付类型</label>
+            <div class="layui-input-block">
+                <select lay-filter="involveType" id="sinvolveType">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">收支类型</label>
+            <div class="layui-input-inline">
+                <select lay-filter="gathering" id="sgathering">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline" style="padding-left: 110px">
+            <div class="layui-input-inline">
+               <input type="button" value="只看收入" class="layui-btn" id="income">
+            </div>
+        </div>
+        <div class="layui-inline" style="padding-left: 125px">
+            <div class="layui-input-inline">
+                <input type="button" value="只看支出" id="amount" class="layui-btn layui-btn-normal">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item" style="text-align: center;">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-search" id="doSearch">查询</button>
+            <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh">重置</button>
+        </div>
+    </div>
+</form>
+
+</body>
+</html>

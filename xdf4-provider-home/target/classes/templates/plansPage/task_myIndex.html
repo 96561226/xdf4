@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>我的任务</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--员工编号-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+
+<div th:replace="plansPage/task_search::search"></div>
+
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+
+<!--防止图片一半显示-->
+<style rel="stylesheet">
+    .layui-table-cell{
+        text-align:center;
+        height: auto;
+        white-space: normal;
+    }
+    .layui-table img{
+        max-width:100%;
+    }
+    .layui-table-cell .layui-form-checkbox [lay-skin="primary"]{
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+
+
+</style>
+
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="detail">查看</a>
+</script>
+
+<div th:replace="plansPage/task_detail::detail_common"></div>
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','form','laydate','laytpl','transfer','util'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var taskDetail = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+        var laytpl = layui.laytpl;
+        var util = layui.util;
+        var transfer = layui.transfer;
+        //初始化日期控件
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({elem: '#ssdate' /*指定元素*/,type: 'datetime'});
+        laydate.render({elem: '#sedate' /*指定元素*/,type: 'datetime'});
+        laydate.render({elem: '#sdate' /*指定元素*/,type: 'datetime'});
+        laydate.render({elem: '#edate' /*指定元素*/,type: 'datetime'});
+        var layerId; //用来保存弹出层的id
+
+        //渲染表格
+        var tableIndex;
+        $.ajax({
+            url: '[[@{/consumer/task/tasks}]]',
+            type: 'GET',
+            data:{action_emp_id:$("#dqyg").text()},
+            dateType: 'json',
+            success: function (res) {
+                tableIndex = table.render({
+                    elem: '#demo'
+                    ,id:'demo'
+                    ,height: 608
+                    ,data:res.data //数据接口
+                    ,toolbar:'#headBar'
+                    ,text:{none:'暂无相关数据'}
+                    ,page: true //开启分页
+                    ,page:{
+                        limit:6
+                        ,limits:[3,6,10,15,25]
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                        ,count:res.count
+                    }
+                    ,cols: [
+                        [
+                            // {type:'checkbox'},
+                            {field:'task_no', title:'任务编号'}
+                            ,{field:'title', title:'任务名称'}
+                            ,{field:'taskSchedulings', title:'任务事项'
+                            ,templet:
+                                function(d){
+                                    var schedulings = "";
+                                    var ary = d.taskSchedulings;
+                                    ary.forEach(function (item,index) {
+                                        schedulings += item.scheduling+",<br/>"
+                                    })
+                                    return schedulings;
+                                }
+                        }
+                            ,{field:'emp_name', title:'创建人'}
+                            ,{field:'dept_name', title:'所属部门'}
+                            ,{field:'cdate', title:'创建日期'}
+                            ,{field:'taskActions', title:'执行人'
+                            ,templet:
+                                function(d){
+                                    var schedulings = "";
+                                    var ary = d.taskActions;
+                                    ary.forEach(function (item,index) {
+                                        schedulings += item.emp_name+",<br/>"
+                                    })
+                                    return schedulings;
+                                }
+                        }
+                            ,{field:'state_name', title:'当前状态'}
+                            ,{toolbar: '#barDemo',fixed:'right',title:'操作',align:'center'}
+                        ]
+                    ]
+
+                });
+            }
+        })
+        //每行的操作 详细信息窗口
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "detail"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#detail")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['900px','600px']
+                    ,success:function(){
+                        // alert(row.plan_no);
+                        $.ajax({
+                            url:'[[@{/consumer/task/tasks}]]',
+                            data:{task_no:row.task_no},
+                            type:'get',
+                            dataType:'json',
+                            success:function(res){
+                                var taskVo = res.data[0];
+
+                                $("#dtitle").val(taskVo.title);
+                                $("#dtype_name").val(taskVo.type_name);
+                                $("#dpname").val(taskVo.pname);
+                                $("#demp_name").val(taskVo.emp_name);
+                                $("#ddept_name").val(taskVo.dept_name);
+                                $("#dsdate").val(taskVo.sdate);
+                                $("#dedate").val(taskVo.edate);
+                                $("#dremark").val(taskVo.remark);
+
+                                var zxr = "";
+                                $.each(taskVo.taskActions,function(i,v){
+                                    zxr += v.emp_name+",";
+                                });
+                                $("#daction").val(zxr);
+
+                                var tableDetail = taskDetail.render({
+                                    elem: '#task_detail'
+                                    ,id:'task_detail'
+                                    ,height: 399
+                                    ,data: taskVo.taskSchedulings //数据接口
+                                    ,toolbar:true
+                                    ,text:{none:'暂无相关数据'}
+                                    ,cols: [
+                                        [
+                                            {type:'numbers'},
+                                            {field:'scheduling',title:'计划事项'}
+                                        ],
+                                    ]
+                                });
+                            }
+                        })
+                    }
+                });
+
+            }
+        });
+        //加载部门下拉列表框
+        $.ajax({
+            url:'[[@{/ds/depts}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                // alert(res.data[0].dept_id);
+                $.each(res.data,function(i,v){
+                    // alert("******i:"+i)
+                    // alert("*****v:"+v.dept_id)
+                    content += "<option value='"+v.dept_id+"'>"+v.dept_name+"</option>";
+                });
+                $("#sdept_id").append(content);
+                form.render('select','searchFrm');
+            }
+        });
+        //加载状态下拉列表框
+        $.ajax({
+            url:'[[@{/formapi/taskStates}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                // alert(res.data[0].dept_id);
+                $.each(res.data,function(i,v){
+                    // alert("******i:"+i)
+                    // alert("*****v:"+v.dept_id)
+                    content += "<option value='"+v.state_id+"'>"+v.state_name+"</option>";
+                });
+                $("#sstate_id").append(content);
+                form.render('select','searchFrm');
+            }
+        });
+        //加载计划类型下拉列表框
+        $.ajax({
+            url:'[[@{/consumer/task/selTaskTypes}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                $.each(res.data,function(i,v){
+                    content += "<option value='"+v.task_tid+"'>"+v.name+"</option>";
+                });
+                $("#stask_tid").append(content);
+                form.render('select','searchFrm');
+            }
+        });
+
+        //刷新多条件查询
+        function refresh(){
+            var task_no = $("#stask_no").val();
+            var title = $("#stitle").val();
+            var dept_id = $("#sdept_id").val();
+            var parent_no = $("#sparent_no").val();
+            var sdate = $("#ssdate").val();
+            var edate = $("#sedate").val();
+            var state = $("#sstate_id").val();
+            var type = $("#stask_tid").val();
+            var emp_id= null;
+            var action_emp_id= null;
+
+            var cxfw = $("#stask_fw").val();
+            switch (cxfw) {
+                case '0':action_emp_id=$("#dqyg").text();break;
+                case '1':emp_id=$("#dqyg").text();break;
+                case '2':action_emp_id=$("#dqyg").text();break;
+            }
+            $.ajax({
+                url: '[[@{/consumer/task/tasks}]]',
+                type: 'GET',
+                dateType: 'json',
+                data:{
+                    task_no:task_no,
+                    title:'%'+title+'%',
+                    dept_id:dept_id,
+                    parent_no:parent_no,
+                    sdate:sdate,
+                    edate:edate,
+                    state:state,
+                    type:type,
+                    emp_id:emp_id,
+                    action_emp_id:action_emp_id,
+                },
+                success: function (res) {
+                    tableIndex.reload(//重载，where后面设置的是传给后台的参数
+                        {
+                            data:res.data
+                        });
+                }
+            })
+        }
+        $("#doSearch").click(function(){
+            refresh();
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示所有的角色</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--员工编号-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+
+<!--表头的操作-->
+<script type="text/html" id="headBar">
+    <a class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-circle" style="color:red;"></i>添加资源</a>
+</script>
+
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs " lay-event="update">编辑</a>
+    {{#  if(d.state === 1){ }}
+    <a class="layui-btn layui-btn-warm layui-btn-xs layui-badge" lay-event="disable">禁用</a>
+    {{#  } }}
+    {{#  if(d.state !== 1){ }}
+    <a class="layui-btn layui-btn-warm layui-btn-xs layui-bg-green" lay-event="enable">恢复</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs layui-badge" lay-event="delete">删除</a>
+    {{#  } }}
+
+</script>
+
+<!--添加和修改的弹出层-->
+<div th:replace="systemmaster/transaction/transaction_update::addOrUpdate"></div>
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','form','laydate','laytpl'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var planDetail = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+
+        var laytpl = layui.laytpl;
+
+        //初始化日期控件
+        var laydate = layui.laydate;
+
+        var layerId; //用来保存弹出层的id
+
+        //渲染表格
+        var tableIndex;
+        $.ajax({
+            url:'[[@{/ts/selectAll}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                tableIndex = table.render({
+                    elem: '#demo'
+                    ,id:'demo'
+                    ,height: 800
+                    ,toolbar:"#headBar"
+                    ,data:res.data
+                    ,text:{none:'暂无相关数据'}
+                    ,page: true //开启分页
+                    ,page:{
+                        limit:25
+                        ,limits:[8,10,25,30]
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                        ,count:res.count
+                    }
+                    ,cols: [
+                        [
+                            // {type:'checkbox'},
+                            {field:'transaction_id', title:'资源ID',hide:true}
+                            ,{field:'transaction_no', title:'资源编号',sort: true}
+                            ,{field:'menu_name', title:'资源名称'}
+                            ,{field:'menu_url', title:'资源路径'}
+                            ,{field:'parent_id', title:'所属资源ID',hide:true}
+                            ,{field:'pname', title:'所属资源名称'}
+                            ,{field:'type', title:'资源类型'
+                            , templet:
+                                function(d){
+                                    if (d.type==1){
+                                        return '<span class="layui-badge layui-bg-green">目录</span>'
+                                    }
+                                    return '<span class="layui-badge layui-bg-gray">页面</span>';
+                                }
+                            }
+                            ,{field:'state', title:'状态'
+                            , templet:
+                                function(d){
+                                    if (d.state==1){
+                                        return '<span class="layui-badge layui-bg-blue">正常</span>'
+                                    }
+                                    return '<span class="layui-badge">禁用</span>';
+                                }
+                            }
+                            ,{field:'remark', title:'备注'}
+                            ,{toolbar: '#barDemo',title:'操作',align:'center'}
+                        ]
+                    ]
+                });
+            }
+        });
+        //表头的操作
+        table.on('toolbar(demo)',function(obj){
+
+            var checkStatus = table.checkStatus(obj.config.id);
+            var layEvent = obj.event;
+            var rows = checkStatus.data;//获取选中行的数据
+            if(layEvent == "add"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#saveOrUpdateDiv")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['900px','400px']
+                    ,success:function(){
+                        $("#dataFrm")[0].reset();//清空表单数据
+                        form.on('submit(formDemo)', function(data){
+                            //获取表单区域所有值
+                            var data1 = form.val("dataFrm");
+                            $.ajax({
+                                url:'[[@{/ts/insert}]]',
+                                data:data1,
+                                type:'POST',
+                                dataType:'json',
+                                success:function(res){
+                                    layer.msg(res.msg);
+                                    layer.close(layIndex);
+                                    $("#dataFrm").reset();//清空表单数据
+                                    window.location.reload();
+                                }
+                            });
+                            return false;
+                        });
+                    }
+                });
+            }
+
+        });
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "update"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#saveOrUpdateDiv")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['900px','600px']
+                    ,success:function(){
+                        $("#dataFrm")[0].reset();//清空表单数据
+                        //设置最初的值
+                        //给表单赋值
+                        form.val("dataFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                            "transaction_id": row.transaction_id // "name": "value"
+                            ,"transaction_no": row.transaction_no
+                            ,"menu_name": row.menu_name
+                            ,"menu_url": row.menu_url
+                            ,"parent_id": row.parent_id
+                            ,"type": row.type
+                            ,"remark": row.remark
+                        });
+                        form.on('submit(formDemo)', function(data){
+                            //获取表单区域所有值
+                            var data1 = form.val("dataFrm");
+                            $.ajax({
+                                url:'[[@{/ts/updTrasaction}]]',
+                                data:data1,
+                                type:'POST',
+                                dataType:'json',
+                                success:function(res){
+                                    layer.msg(res.msg);
+                                    layer.close(layIndex);
+                                    $("#dataFrm").reset();//清空表单数据
+                                    window.location.reload();
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+            else if (layEvent == "disable"){
+                $.ajax({
+                    url:'[[@{/ts/updTrasaction}]]',
+                    type:'POST',
+                    data:{transaction_id:row.transaction_id,state:2},
+                    dateType:'json',
+                    success:function(res){
+                        layer.msg(res.msg);
+                        window.location.reload();
+                    }
+                })
+            }
+            else if (layEvent == "enable"){
+                $.ajax({
+                    url:'[[@{/ts/updTrasaction}]]',
+                    type:'POST',
+                    data:{transaction_id:row.transaction_id,state:1},
+                    dateType:'json',
+                    success:function(res){
+                        layer.msg(res.msg);
+                        window.location.reload();
+                    }
+                })
+            }
+            else if (layEvent == "delete"){
+                if(confirm("确定要删除吗？")){
+                    $.ajax({
+                        url:'[[@{/ts/delTrasaction}]]',
+                        type:'POST',
+                        data:{_method:'DELETE',tid:row.transaction_id},
+                        dateType:'json',
+                        success:function(res){
+                            layer.msg(res.msg);
+                            window.location.reload();
+                        }
+                    })
+                }
+            }
+        });
+
+        //加载资源下拉框
+        $.ajax({
+            url:'[[@{/ts/selectAll}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                $.each(res.data,function(i,v){
+                    if (v.type==1){
+                        content += "<option value='"+v.transaction_id+"'>"+v.menu_name+"</option>";
+                    }
+                });
+                $("#parent_id").append(content);
+                form.render('select','dataFrm');
+            }
+        });
+    });
+</script>
+</body>
+</html>

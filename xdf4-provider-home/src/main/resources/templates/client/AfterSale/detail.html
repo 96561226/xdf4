@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form">
+    <div class="layui-form-item" style="display: none;" id="fid">
+        <label class="layui-form-label">编号</label>
+        <div class="layui-input-block">
+            <input id="ds_id" type="text" name="s_id" readonly class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">主题</label>
+        <div class="layui-input-block">
+            <input type="text" id="dtheme" name="theme"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="display: inline-block;">类型</label>
+        <div class="layui-input-block">
+            <input type="text" id="dtypeid" name="typeid"  readonly  class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开始时间</label>
+        <div class="layui-input-block">
+            <input type="text" id="dstartTime" name="startTime"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务人员</label>
+        <div class="layui-input-block">
+            <input type="text" id="demp_id" name="emp_id"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务评分</label>
+        <div class="layui-input-block">
+            <input type="text" id="dgrade" name="grade"  readonly   class="layui-input">
+        </div>
+    </div>
+
+
+
+</form>
+</div>
+</body>
+</html>

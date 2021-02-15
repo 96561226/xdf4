@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.dimission.DimissionMapper">
+    <resultMap id="tbDimissionVoMap" type="com.aaa.pojo.personnel.TbDimissionVo">
+        <result column="dimission_id" jdbcType="INTEGER" property="dimissionId" />
+        <result column="dimission_no" jdbcType="VARCHAR" property="dimissionNo" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="apply_date" jdbcType="DATE" property="applyDate" />
+        <result column="dept_id" jdbcType="INTEGER" property="deptId" />
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+        <result column="role_id" jdbcType="INTEGER" property="roleId" />
+        <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+        <result column="dimission_date" jdbcType="DATE" property="dimissionDate" />
+        <result column="type_id" jdbcType="INTEGER" property="typeId" />
+        <result column="type" jdbcType="VARCHAR" property="typeName" />
+        <result column="cause" jdbcType="VARCHAR" property="cause" />
+        <result column="connect" jdbcType="VARCHAR" property="connect" />
+        <result column="opinion" jdbcType="VARCHAR" property="opinion" />
+        <result column="end_date" jdbcType="DATE" property="endDate" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="fstate_name" jdbcType="VARCHAR" property="stateName" />
+        <collection property="dimissionNotifyVos" ofType="com.aaa.pojo.personnel.TbEntryNotify"
+                    column="dimission_id" select="com.aaa.mapper.dimission.DimissionNotifyMapper.selectDimissionNotifys">
+            <id column="id" jdbcType="INTEGER" property="id"></id>
+        </collection>
+        <collection property="dimissionApproverVos" ofType="com.aaa.pojo.personnel.TbEntryApprover"
+                    column="dimission_id" select="com.aaa.mapper.dimission.DimissionApproverMapper.selectDimissionApprovers">
+            <id column="id" jdbcType="INTEGER" property="id" ></id>
+        </collection>
+    </resultMap>
+
+<!--  添加  -->
+    <insert id="addDimission" parameterType="com.aaa.pojo.personnel.TbRecruit">
+        insert into tb_dimission(
+            dimission_no, emp_id, apply_date,
+            dept_id, role_id, dimission_date,
+            type_id, cause,connect, opinion
+        )values(
+            #{dimissionNo},#{empId},curdate(),#{deptId},#{roleId},#{dimissionDate},#{typeId},
+            #{cause},#{connect},#{opinion}
+        )
+    </insert>
+    <select id="selectDeptIdByEmpId" parameterType="Long" resultType="java.lang.Long">
+        select dept_id from tb_emp where emp_id = #{empId}
+    </select>
+<!--  作废  -->
+    <update id="updateDimission" parameterType="com.aaa.pojo.personnel.TbDimission">
+        update tb_dimission set end_date = curdate(), state = #{state} where dimission_id = #{dimissionId}
+    </update>
+    <select id="selNo" parameterType="java.lang.String" resultType="java.lang.String">
+        select CONCAT(#{noName},(select right(1000000+(select max(dimission_id)+1 from tb_dimission),6)))
+    </select>
+<!--  条件查询  -->
+    <select id="selectDimission" parameterType="com.aaa.pojo.personnel.SearchRecruit" resultMap="tbDimissionVoMap">
+        select dimission.*,type.type,emp.emp_name,dept.dept_name,role.role_name,tfs.fstate_name
+        from tb_dimission dimission
+        left join tb_dimission_type type
+        on dimission.type_id = type.id
+        left join tb_emp emp
+        ON dimission.emp_id = emp.emp_id
+        left join tb_dept dept
+        on dimission.dept_id = dept.dept_id
+        left join tb_roles role
+        on dimission.role_id = role.role_id
+        left join tb_form_state tfs
+        on dimission.state = tfs.state_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="dimissionId != null">
+                and dimission.dimission_Id = #{dimissionId}
+            </if>
+            <if test="dimissionNo != null">
+                and dimission.dimission_no like "%"#{dimissionNo}"%"
+            </if>
+            <if test="empId != null">
+                and dimission.emp_id = #{empId}
+            </if>
+            <if test="roleId != null">
+                and dimission.role_id = #{roleId}
+            </if>
+            <if test="state != null">
+                and dimission.state = #{state}
+            </if>
+        </trim>
+        order by dimission.dimission_id desc
+    </select>
+    <!--查询全部离职类型-->
+    <select id="selectTypeAll" resultType="com.aaa.pojo.personnel.TbDimissionType">
+        select * from tb_dimission_type
+    </select>
+</mapper>

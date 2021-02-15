@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.StatementSchedulingMapper">
+    <insert id="insertStatementScheduling" parameterType="com.aaa.pojo.plans.TbStatementScheduling">
+        insert into tb_statement_scheduling (sid, scheduling) values (#{sid},#{scheduling})
+    </insert>
+
+    <delete id="delStatementScheduling">
+        delete from tb_statement_scheduling where statement_sid=#{statement_sid}
+    </delete>
+
+    <update id="updStatementScheduling" parameterType="com.aaa.pojo.plans.TbStatementScheduling">
+        update tb_statement_scheduling
+        <set>
+            <if test=" sid!=null"> sid =#{sid}, </if>
+            <if test=" scheduling!=null"> scheduling =#{scheduling} </if>
+        </set>
+        where statement_sid=#{statement_sid}
+    </update>
+
+    <select id="selStatementSchedulingByStatementId" resultType="com.aaa.pojo.plans.TbStatementScheduling">
+        select * from tb_statement_scheduling where sid=#{statement_id}
+    </select>
+
+</mapper>

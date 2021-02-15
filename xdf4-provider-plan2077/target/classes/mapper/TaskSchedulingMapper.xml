@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.TaskSchedulingMapper">
+
+    <select id="selTaskSchedulingByTaskId" resultType="com.aaa.pojo.plans.TbTaskScheduling">
+        select * from tb_task_scheduling where task_id=#{task_id}
+    </select>
+
+    <insert id="insertTaskScheduling" parameterType="com.aaa.pojo.plans.TbTaskScheduling">
+        insert into tb_task_scheduling(task_id, scheduling)
+        value (#{task_id},#{scheduling})
+    </insert>
+
+    <delete id="delTaskScheduling">
+        delete from tb_task_scheduling where task_sid=#{task_sid}
+    </delete>
+
+    <update id="updTaskScheduling" parameterType="com.aaa.pojo.plans.TbTaskScheduling">
+        update tb_task_scheduling
+        <set>
+            <if test="task_id!=null">task_id=#{task_id},</if>
+            <if test="scheduling!=null and scheduling!=''">scheduling=#{scheduling}</if>
+        </set>
+        where task_sid=#{task_sid}
+    </update>
+</mapper>

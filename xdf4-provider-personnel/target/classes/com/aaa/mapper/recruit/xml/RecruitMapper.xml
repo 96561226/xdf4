@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.recruit.RecruitMapper">
+    <resultMap id="tbRecruitVoMap" type="com.aaa.pojo.personnel.TbRecruitVo">
+        <result column="recruit_id" jdbcType="INTEGER" property="recruitId" />
+        <result column="recruit_no" jdbcType="VARCHAR" property="recruitNo" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="dept_id" jdbcType="INTEGER" property="deptId" />
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="theme" jdbcType="VARCHAR" property="theme" />
+        <result column="role_id" jdbcType="INTEGER" property="roleId" />
+        <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+        <result column="number" jdbcType="INTEGER" property="number" />
+        <result column="arrival_date" jdbcType="DATE" property="arrivalDate" />
+        <result column="cause" jdbcType="VARCHAR" property="cause" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="foreign_require" jdbcType="VARCHAR" property="foreignRequire" />
+        <result column="min_age" jdbcType="INTEGER" property="minAge" />
+        <result column="max_age" jdbcType="INTEGER" property="maxAge" />
+        <result column="sex" jdbcType="VARCHAR" property="sex" />
+        <result column="education" jdbcType="VARCHAR" property="education" />
+        <result column="major" jdbcType="VARCHAR" property="major" />
+        <result column="site" jdbcType="VARCHAR" property="site" />
+        <result column="experience" jdbcType="VARCHAR" property="experience" />
+        <result column="apply_date" jdbcType="DATE" property="applyDate" />
+        <result column="end_date" jdbcType="DATE" property="endDate" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="fstate_name" jdbcType="VARCHAR" property="stateName" />
+        <collection property="recruitNotifies" ofType="com.aaa.pojo.personnel.TbRecruitNotify"
+                     column="recruit_id" select="com.aaa.mapper.recruit.RecruitNotifyMapper.selectRecruitNotifys">
+            <id column="id" jdbcType="INTEGER" property="id"></id>
+        </collection>
+        <collection property="recruitApprovers" ofType="com.aaa.pojo.personnel.TbRecruitApprover"
+                    column="recruit_id" select="com.aaa.mapper.recruit.RecruitApproverMapper.selectRecruitApprovers">
+            <id column="id" jdbcType="INTEGER" property="id" ></id>
+        </collection>
+    </resultMap>
+
+<!--  添加  -->
+    <insert id="addRecruit" parameterType="com.aaa.pojo.personnel.TbRecruit">
+        insert into tb_recruit(
+            recruit_no,emp_id,dpet_id,
+            theme,role_id,number,
+            arrival_date,cause,
+            content,foreign_require,
+            min_age,max_age,sex,education,
+            major,site,experience,
+            apply_date)
+        values(
+            #{recruitNo},#{empId},#{deptId},#{theme},
+            #{roleId},#{number},#{arrivalDate},#{cause},#{content},#{foreignRequire},#{minAge},#{maxAge},
+            #{sex},#{education},#{major},#{site},
+            #{experience},curdate());
+    </insert>
+    <select id="selectDeptIdByEmpId" parameterType="Long" resultType="java.lang.Long">
+        select dept_id from tb_emp where emp_id = #{empId}
+    </select>
+<!--  作废  -->
+    <update id="updateRecruit" parameterType="com.aaa.pojo.personnel.TbRecruit">
+        update tb_recruit set end_date = curdate(), state = #{state} where recruit_id = #{recruitId}
+    </update>
+    <select id="selNo" parameterType="java.lang.String" resultType="java.lang.String">
+        select CONCAT(#{noName},(select right(1000000+(select max(recruit_id)+1 from tb_recruit),6)))
+    </select>
+<!--  条件查询  -->
+    <select id="selectRecruit" parameterType="com.aaa.pojo.personnel.SearchRecruit" resultMap="tbRecruitVoMap">
+        select recruit.*,emp.emp_name,role.role_name,tfs.fstate_name from tb_recruit recruit
+        left join tb_emp emp
+        on recruit.emp_id = emp.emp_id
+        left join tb_roles role
+        on recruit.role_id = role.role_id
+        left join tb_form_state tfs
+        on recruit.state = tfs.state_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="recruitId != null">
+                and recruit.recruit_Id = #{recruitId}
+            </if>
+            <if test="recruitNo != null">
+                and recruit.recruit_no like "%"#{recruitNo}"%"
+            </if>
+            <if test="empId != null">
+                and recruit.emp_id = #{empId}
+            </if>
+            <if test="roleId != null">
+                and recruit.role_id = #{roleId}
+            </if>
+            <if test="state != null">
+                and recruit.state = #{state}
+            </if>
+        </trim>
+        order by recruit.recruit_id desc
+    </select>
+</mapper>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form">
+    <div class="layui-form-item" style="display: none;" id="fid">
+        <label class="layui-form-label">编号</label>
+        <div class="layui-input-block">
+            <input id="dc_id" type="text" name="c_id" readonly class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">客户名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="dcname" name="cname"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">预计成交金额</label>
+        <div class="layui-input-block">
+            <input type="text" id="dpredict" name="predict"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">合同数</label>
+        <div class="layui-input-block">
+            <input type="text" id="dp_count" name="p_count"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">合同金额</label>
+        <div class="layui-input-block">
+            <input type="text" id="dpactmoney" name="pactmoney"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">回款数</label>
+        <div class="layui-input-block">
+            <input type="text" id="dreturned" name="returned"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">售后服务数</label>
+        <div class="layui-input-block">
+            <input type="text" id="ds_count" name="s_count"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务均分</label>
+        <div class="layui-input-block">
+            <input type="text" id="dserve" name="serve"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="display: inline-block;">所属类型</label>
+        <div class="layui-input-block">
+            <input type="text" id="dtype_id" name="type_id"  readonly  class="layui-input">
+        </div>
+    </div>
+
+</form>
+</div>
+</body>
+</html>

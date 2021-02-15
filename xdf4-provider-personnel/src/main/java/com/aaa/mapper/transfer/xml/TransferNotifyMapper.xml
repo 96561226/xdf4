@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.transfer.TransferNotifyMapper">
+
+    <resultMap id="tbTransferNotifyVoMap" type="com.aaa.pojo.personnel.TbTransferNotifyVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="transfer_id" jdbcType="INTEGER" property="transferId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    </resultMap>
+    <select id="selectTransferNotifys" parameterType="Integer" resultMap="tbTransferNotifyVoMap">
+        select * from tb_transfer_notify notify
+        left join tb_emp emp
+        on notify.emp_id = emp.emp_id
+        where notify.transfer_id = #{id}
+    </select>
+    <insert id="insertTransferNotify" parameterType="com.aaa.pojo.personnel.TbTransferNotify">
+        insert into tb_transfer_notify(
+            transfer_id,emp_id
+        )values(
+            #{transferId},#{empId}
+        )
+    </insert>
+</mapper>

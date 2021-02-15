@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form">
+    <div class="layui-form-item" style="display: none;" id="fid">
+        <label class="layui-form-label">文档编号</label>
+        <div class="layui-input-block">
+            <input id="did" type="text" name="id" readonly class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">文档名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="ddname" name="dname"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">版本号</label>
+        <div class="layui-input-block">
+            <input type="text" id="dversions" name="versions"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">文档相关信息</label>
+        <div class="layui-input-block">
+            <input type="text" id="daccessory" name="accessory"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">作者</label>
+        <div class="layui-input-block">
+            <input type="text" id="dauthor" name="author"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">更新时间</label>
+        <div class="layui-input-block">
+            <input type="text" id="dupdatetime" name="updatetime"  readonly   class="layui-input">
+        </div>
+    </div>
+
+</form>
+</div>
+</body>
+</html>

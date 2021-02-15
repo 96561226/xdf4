@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PlanActionMapper">
+ <!--   <resultMap id="BaseResultMap" type="com.aaa.pojo.plans.TbPlanAction">
+        <id column="plan_aid" jdbcType="INTEGER" property="plan_aid" />
+        <result column="pid" jdbcType="INTEGER" property="pid" />
+        <result column="action_emp_id" jdbcType="INTEGER" property="action_emp_id" />
+    </resultMap>
+
+    <select id="selPlanActionByPlanId" resultMap="BaseResultMap">
+        select tpa.*,e.emp_name from tb_plan_action tpa
+        inner join tb_emp e on tpa.pid=#{plan_id} and e.emp_id = tpa.action_emp_id
+    </select>-->
+
+    <insert id="insertPlanAction" parameterType="com.aaa.pojo.plans.TbPlanAction">
+        insert into tb_plan_action (pid, action_emp_id) values (#{pid},#{action_emp_id})
+    </insert>
+
+    <delete id="delPlanAction">
+        delete from tb_plan_action where plan_aid=#{plan_aid}
+    </delete>
+
+    <update id="updPlanAction" parameterType="com.aaa.pojo.plans.TbPlanAction">
+        update tb_plan_action
+        <set>
+            <if test=" pid!=null"> pid =#{pid}, </if>
+            <if test=" action_emp_id!=null">  action_emp_id=#{action_emp_id} </if>
+        </set>
+        where plan_aid=#{plan_aid}
+    </update>
+
+</mapper>

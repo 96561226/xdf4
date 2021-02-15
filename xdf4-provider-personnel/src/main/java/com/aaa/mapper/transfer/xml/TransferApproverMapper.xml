@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.transfer.TransferApproverMapper">
+
+    <resultMap id="tbTransferApproverVoMap" type="com.aaa.pojo.personnel.TbTransferApproverVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="transfer_id" jdbcType="INTEGER" property="transferId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <select id="selectTransferApprovers" parameterType="Integer" resultMap="tbTransferApproverVoMap">
+            select approver.*,emp.emp_name,tas.state_name from tb_transfer_approver approver
+            left join tb_emp emp
+            on approver.emp_id = emp.emp_id
+            left join tb_approver_state tas
+            on approver.state = tas.state_id
+            where approver.transfer_id = #{id}
+    </select>
+
+    <insert id="insertTransferApprover" parameterType="com.aaa.pojo.personnel.TbTransferApprover">
+        insert into tb_transfer_approver(
+            transfer_id,emp_id,remark
+        )values(
+            #{transferId},#{empId},#{remark}
+        );
+    </insert>
+    <update id="updateState" parameterType="com.aaa.pojo.personnel.TbTransferApprover">
+        update tb_transfer_approver
+        set state = 2
+        where transfer_id = #{transferId}
+        and emp_id = #{empId}
+    </update>
+</mapper>

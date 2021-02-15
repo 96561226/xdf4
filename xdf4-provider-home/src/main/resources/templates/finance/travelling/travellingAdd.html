@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<style>
+    table td{
+        width: 100px;
+    }
+</style>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <table class="layui-table" id="tab">
+            <tr>
+                <td>申请编号</td>
+                <td colspan="2">
+                    <input disabled type="button" style="width: 100%;text-align: left" id="travellingNo" name="travellingNo"  class="layui-btn layui-btn-primary">
+                </td>
+                <td>*出差人姓名</td>
+                <td colspan="2">
+                    <select lay-filter="emp" required lay-verify="required" name="empId" id="empId">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>*报销日期</td>
+                <td colspan="2">
+                    <input type="text" required lay-verify="required" name="applyDate" id="applyDate" autocomplete="off" class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>出差事由</td>
+                <td colspan="8">
+                    <textarea name="cause" required lay-verify="required" placeholder="请输入您的出差事由" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>起止时间</td>
+                <td>起止地点</td>
+                <td>描述</td>
+                <td>长途交通费</td>
+                <td>市内交通费</td>
+                <td>住宿费</td>
+                <td>出差补贴</td>
+                <td>其他费用</td>
+                <td>
+                    <button type="button" class="layui-btn layui-btn-sm" id="add">
+                        <i class="layui-icon">&#xe654;</i>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="text" name="startStopTime" class="layui-input xxx">
+                </td>
+                <td>
+                    <input type="text" name="startStopAddress" class="layui-input xxx" >
+                </td>
+                <td>
+                    <input type="text" name="description" class="layui-input xxx">
+                </td>
+                <td>
+                    <input type="text" name="tramp" class="layui-input xxx">
+                </td>
+                <td>
+                    <input type="text" name="city" class="layui-input xxx">
+                </td>
+                <td>
+                    <input type="text" name="stay" class="layui-input xxx">
+                </td>
+                <td>
+                    <input type="text" name="evection" class="layui-input xxx">
+                </td>
+                <td>
+                    <input type="text" name="others" class="layui-input xxx">
+                </td>
+                <td>
+                    <button type="button" class="layui-btn layui-btn-sm del" >
+                        <i class="layui-icon">&#xe640;</i>
+                    </button>
+                </td>
+            </tr>
+        </table>
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批人</label>
+            <div id="charge_emp_ids" name="charge_emp_ids" class="demo-transfer"></div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

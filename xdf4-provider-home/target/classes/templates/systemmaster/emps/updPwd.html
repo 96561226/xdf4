@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示所有的员工</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--员工编号-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[1]"/>
+<form class="layui-form" action="" style="margin-top:15%">
+    <div class="layui-row">
+        <div class="layui-col-md4"><div class="layui-form-item"></div></div>
+        <div class="layui-col-md5">
+            <div class="layui-form-item">
+                <label class="layui-form-label">原密码：</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="pwd" id="pwd" required  lay-verify="required" placeholder="请输入原密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md4"><div class="layui-form-item"></div></div>
+        <div class="layui-col-md5">
+            <div class="layui-form-item">
+                <label class="layui-form-label">新密码:</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="newPwd" id="newPwd" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">建议设置复杂密码提高安全性</div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md4"><div class="layui-form-item"></div></div>
+        <div class="layui-col-md5">
+            <div class="layui-form-item">
+                <label class="layui-form-label">确认新密码:</label>
+                <div class="layui-input-inline">
+                    <input type="password" name="rePwd" id="rePwd" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md4"><div class="layui-form-item"></div></div>
+        <div class="layui-col-md5">
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<script type="text/javascript">
+    layui.use(['jquery','layer','form','laydate','laytpl'],function(){
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var form = layui.form;
+
+        form.on('submit(formDemo)', function(data){
+            if ($("#rePwd").val()!=$("#newPwd").val()){
+                layer.msg("新密码重复验证不一样");
+            }
+            //获取表单区域所有值
+            var data1 = form.val("dataFrm");
+            $.ajax({
+                url:'[[@{/consumer/emps/updMyEmp}]]',
+                data:{
+                    emp_no:$("#dqyg").text(),
+                    pwd:$("#pwd").val(),
+                    newPwd:$("#newPwd").val()
+                },
+                type:'POST',
+                dataType:'json',
+                success:function(res){
+                    layer.msg(res.msg);
+                }
+            });
+            return false;
+        });
+
+
+    });
+</script>
+</body>
+</html>

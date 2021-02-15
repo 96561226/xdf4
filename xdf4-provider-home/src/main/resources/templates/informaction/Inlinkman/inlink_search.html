@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>联系人查询</title>
+</head>
+<body>
+<form action="" class="layui-form" method="get" id="searchFrm" lay-filter="searchFrm" th:fragment="search">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">所属机构</label>
+            <div class="layui-input-block">
+                <select lay-filter="dept_id" id="sdept_id">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item" style="text-align: center;">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-search" id="doSearch">查询</button>
+            <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh">重置</button>
+        </div>
+    </div>
+</form>
+
+</body>
+</html>

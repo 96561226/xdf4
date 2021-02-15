@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item" style="display: none;" id="fid">
+            <label class="layui-form-label">联系人编号</label>
+            <div class="layui-input-block">
+                <input id="id" type="text" name="id" required   readonly placeholder="联系人编号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-block">
+                <input type="text" id="linkname" name="linkname" required  lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">头衔</label>
+            <div class="layui-input-block">
+                <input type="text" id="title" name="title" required  lay-verify="required" placeholder="请输入头衔" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属单位</label>
+            <div class="layui-input-block">
+                <input type="text" id="institution" name="institution" required  lay-verify="required" placeholder="请输入所属单位" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">固定电话</label>
+            <div class="layui-input-block">
+                <input type="text" id="gphone" name="gphone" required  lay-verify="required" placeholder="请输入固定电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">移动电话</label>
+            <div class="layui-input-block">
+                <input type="text" id="yphone" name="yphone" required  lay-verify="required" placeholder="请输入移动电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属类型</label>
+            <div class="layui-input-block">
+                <select name="typeid" lay-filter="typeid" id="typeid">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

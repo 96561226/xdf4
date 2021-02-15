@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.demo.mapper.InLinkmanMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.informaction.TbinlinkmanVo">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <association column="emp_id" javaType="com.aaa.pojo.Emp" property="emp">
+            <id column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        </association>
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aaa.pojo.informaction.SearchInlinkman">
+        SELECT e.emp_name,e.emp_id,d.dept_id,l.id,l.pic,l.signature,l.gphone,l.yphone,l.email,l.urgent,l.im,d.dept_name FROM tb_emp e
+        LEFT JOIN tb_inlinkman l
+        ON l.emp_id=e.emp_id
+        LEFT JOIN tb_dept d
+        ON e.dept_id=d.dept_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="id != null">
+                and l.id = #{id}
+            </if>
+            <if test="dept_id != null">
+                and l.dept_id = #{dept_id}
+            </if>
+        </trim>
+    </select>
+
+    <select id="findByID" parameterType="com.aaa.pojo.informaction.Tbinlinkman" resultType="com.aaa.pojo.informaction.Tbinlinkman">
+    select * from tb_inlinkman
+        <trim prefix="where" prefixOverrides="and">
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="emp_id != null">
+                and emp_id = #{emp_id}
+            </if>
+        </trim>
+    </select>
+
+    <insert id="insert" parameterType="com.aaa.pojo.informaction.Tbinlinkman">
+        insert into tb_inlinkman (pic,emp_id,signature,dept_id,
+        gphone,yphone,email,im,urgent)
+        values (#{pic}, #{emp_id},#{signature},#{dept_id},
+        #{gphone}, #{yphone},#{email},#{im},#{urgent})
+    </insert>
+
+    <delete id="del" parameterType="int">
+        delete from tb_inlinkman where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.aaa.pojo.informaction.Tbinlinkman">
+        update tb_inlinkman set pic = #{pic},emp_id = #{emp_id},
+        signature = #{signature},dept_id = #{dept_id},
+        gphone = #{gphone},yphone = #{yphone},
+        email = #{email},im = #{im},urgent=#{urgent}
+        where id = #{id}
+    </update>
+</mapper>

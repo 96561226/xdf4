@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示所有的角色</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--员工编号-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+
+<!--表头的操作-->
+<script type="text/html" id="headBar">
+    <a class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-circle" style="color:red;"></i>添加角色</a>
+</script>
+
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs " lay-event="update">编辑</a>
+    {{#  if(d.role_state === 1){ }}
+    <a class="layui-btn layui-btn-warm layui-btn-xs layui-badge" lay-event="disable">禁用</a>
+    {{#  } }}
+    {{#  if(d.role_state !== 1){ }}
+    <a class="layui-btn layui-btn-warm layui-btn-xs layui-bg-green" lay-event="enable">恢复</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs layui-badge" lay-event="delete">删除</a>
+    {{#  } }}
+
+</script>
+
+<!--添加和修改的弹出层-->
+<div th:replace="systemmaster/roles/role_update::addOrUpdate"></div>
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','form','laydate','laytpl'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var planDetail = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+
+        var laytpl = layui.laytpl;
+
+        //初始化日期控件
+        var laydate = layui.laydate;
+
+        var layerId; //用来保存弹出层的id
+
+        //渲染表格
+        var tableIndex;
+        $.ajax({
+            url:'[[@{/rs/selectRoles}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                tableIndex = table.render({
+                    elem: '#demo'
+                    ,id:'demo'
+                    ,height: 800
+                    ,toolbar:"#headBar"
+                    ,data:res.data
+                    ,text:{none:'暂无相关数据'}
+                    ,page: true //开启分页
+                    ,page:{
+                        limit:10
+                        ,limits:[8,10,25,30]
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                        ,count:res.count
+                    }
+                    ,cols: [
+                        [
+                            // {type:'checkbox'},
+                            {field:'role_id', title:'角色ID',hide:true}
+                            ,{field:'role_name', title:'角色名称'}
+                            ,{field:'role_des', title:'角色介绍'}
+                            ,{field:'dept_id', title:'所属部门ID',hide:true}
+                            ,{field:'dept_name', title:'所属部门'}
+                            ,{field:'state', title:'状态'
+                            , templet:
+                                function(d){
+                                    if (d.role_state==1){
+                                        return '<span class="layui-badge layui-bg-blue">正常</span>'
+                                    }
+                                    return '<span class="layui-badge">禁用</span>';
+                                }
+                            }
+                            ,{toolbar: '#barDemo',title:'操作',align:'center'}
+                        ]
+                    ]
+                });
+            }
+        });
+        //表头的操作
+        table.on('toolbar(demo)',function(obj){
+
+            var checkStatus = table.checkStatus(obj.config.id);
+            var layEvent = obj.event;
+            var rows = checkStatus.data;//获取选中行的数据
+            if(layEvent == "add"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#saveOrUpdateDiv")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['900px','400px']
+                    ,success:function(){
+                        $("#dataFrm")[0].reset();//清空表单数据
+                        form.on('submit(formDemo)', function(data){
+                            //获取表单区域所有值
+                            var data1 = form.val("dataFrm");
+                            $.ajax({
+                                url:'[[@{/rs/insertRole}]]',
+                                data:data1,
+                                type:'POST',
+                                dataType:'json',
+                                success:function(res){
+                                    layer.msg(res.msg);
+                                    layer.close(layIndex);
+                                    $("#dataFrm").reset();//清空表单数据
+                                    window.location.reload();
+                                }
+                            });
+                            return false;
+                        });
+                    }
+                });
+            }
+
+        });
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "update"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#saveOrUpdateDiv")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['900px','600px']
+                    ,success:function(){
+                        $("#dataFrm")[0].reset();//清空表单数据
+                        //设置最初的值
+                        //给表单赋值
+                        form.val("dataFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                            "role_id": row.role_id // "name": "value"
+                            ,"role_name": row.role_name
+                            ,"role_des": row.role_des
+                            ,"dept_id": row.dept_id
+                        });
+                        form.on('submit(formDemo)', function(data){
+                            //获取表单区域所有值
+                            var data1 = form.val("dataFrm");
+                            $.ajax({
+                                url:'[[@{/rs/updRole}]]',
+                                data:data1,
+                                type:'POST',
+                                dataType:'json',
+                                success:function(res){
+                                    layer.msg(res.msg);
+                                    layer.close(layIndex);
+                                    $("#dataFrm").reset();//清空表单数据
+                                    window.location.reload();
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+            else if (layEvent == "disable"){
+                $.ajax({
+                    url:'[[@{/rs/updRole}]]',
+                    type:'POST',
+                    data:{role_id:row.role_id,role_state:2},
+                    dateType:'json',
+                    success:function(res){
+                        layer.msg(res.msg);
+                        window.location.reload();
+                    }
+                })
+            }
+            else if (layEvent == "enable"){
+                $.ajax({
+                    url:'[[@{/rs/updRole}]]',
+                    type:'POST',
+                    data:{role_id:row.role_id,role_state:1},
+                    dateType:'json',
+                    success:function(res){
+                        layer.msg(res.msg);
+                        window.location.reload();
+                    }
+                })
+            }
+            else if (layEvent == "delete"){
+                if(confirm("确定要删除吗？")){
+                    $.ajax({
+                        url:'[[@{/rs/delRole}]]',
+                        type:'POST',
+                        data:{_method:'DELETE',role_id:row.role_id},
+                        dateType:'json',
+                        success:function(res){
+                            layer.msg(res.msg);
+                            window.location.reload();
+                        }
+                    })
+                }
+            }
+        });
+        //加载部门下拉列表框
+        $.ajax({
+            url:'[[@{/ds/depts}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                // alert(res.data[0].dept_id);
+                $.each(res.data,function(i,v){
+                    // alert("******i:"+i)
+                    // alert("*****v:"+v.dept_id)
+                    content += "<option value='"+v.dept_id+"'>"+v.dept_name+"</option>";
+                });
+                $("#dept_id").append(content);
+                form.render('select','dataFrm');
+            }
+        });
+    });
+</script>
+</body>
+</html>

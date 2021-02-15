@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.TaskMapper">
+
+    <resultMap id="taskVo" type="com.aaa.pojo.plans.TaskVo">
+        <id column="task_id" jdbcType="INTEGER" property="task_id" />
+        <result column="task_no" jdbcType="VARCHAR" property="task_no" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="parent_id" jdbcType="INTEGER" property="parent_id" />
+        <result column="pname" jdbcType="VARCHAR" property="pname" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+        <result column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        <result column="emp_name" jdbcType="VARCHAR" property="emp_name" />
+        <result column="cdate" jdbcType="DATE" property="cdate" />
+        <result column="sdate" jdbcType="DATE" property="sdate" />
+        <result column="edate" jdbcType="DATE" property="edate" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="type_name" jdbcType="INTEGER" property="type_name" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="state_name" />
+        <collection property="taskActions" ofType="com.aaa.pojo.plans.TbTaskAction">
+            <id column="task_aid" jdbcType="INTEGER" property="task_aid" />
+            <result column="task_id" jdbcType="INTEGER" property="task_id" />
+            <result column="aemp_id" jdbcType="INTEGER" property="action_emp_id" />
+            <result column="aname" jdbcType="VARCHAR" property="emp_name" />
+        </collection>
+        <collection property="taskSchedulings" ofType="com.aaa.pojo.plans.TbTaskScheduling" column="task_id" select="com.aaa.springcloud.mapper.TaskSchedulingMapper.selTaskSchedulingByTaskId">
+            <id column="task_sid" jdbcType="INTEGER" property="task_sid" />
+        </collection>
+    </resultMap>
+
+    <insert id="addTask" parameterType="com.aaa.pojo.plans.TbTask">
+        insert into tb_task(task_no, parent_id, title, dept_id, emp_id, cdate, sdate, edate, remark, type)
+        values (#{task_no},#{parent_id},#{title},#{dept_id},#{emp_id},#{cdate},#{sdate},#{edate},#{remark},#{type})
+    </insert>
+
+    <delete id="delTask">
+        delete from tb_task where task_id=#{task_id}
+    </delete>
+
+    <update id="updTask" parameterType="com.aaa.pojo.plans.TbTask">
+        update tb_task
+        <set>
+            <if test=" task_no!=null and task_no !='' "> task_no = #{task_no}, </if>
+            <if test=" parent_id!=null"> parent_id = #{parent_id}, </if>
+            <if test=" title!=null and title!='' "> title = #{title}, </if>
+            <if test=" dept_id!=null "> dept_id = #{dept_id}, </if>
+            <if test=" emp_id!=null "> emp_id = #{emp_id}, </if>
+            <if test=" cdate!=null "> cdate = #{cdate}, </if>
+            <if test=" sdate!=null "> sdate = #{sdate}, </if>
+            <if test=" edate!=null "> edate = #{edate}, </if>
+            <if test=" remark!=null and remark!='' "> remark = #{remark}, </if>
+            <if test=" type!=null "> type = #{type}, </if>
+            <if test=" state!=null "> state = #{state}, </if>
+        </set>
+        where task_id=#{task_id}
+    </update>
+
+    <select id="selSeaTask" parameterType="com.aaa.searchpojo.SearchTask" resultMap="taskVo">
+        select tt.*,tp.title pname,te.emp_name,td.dept_name,tts.state_name,ttt.name type_name
+        ,teaction.emp_name aname,teaction.emp_id aemp_id,tta.task_aid
+        from tb_task tt
+        left join tb_task tp on  tt.parent_id = tp.task_id
+        inner join tb_emp te on tt.emp_id = te.emp_id
+        inner join tb_dept td on tt.dept_id = td.dept_id
+        inner join tb_task_state tts on tt.state = tts.state_id
+        inner join tb_task_type ttt on tt.type = ttt.task_tid
+
+
+        left join tb_task_action tta on tt.task_id = tta.task_id
+        left join tb_emp teaction on teaction.emp_id = tta.action_emp_id
+
+
+        <trim prefix="where" prefixOverrides="and">
+
+            <if test="action_emp_id!=null"> and tta.action_emp_id = #{action_emp_id} </if>
+
+            <if test="task_id!=null"> and tt.task_id=#{task_id} </if>
+            <if test="task_no!=null and task_no!=''"> and tt.task_no=#{task_no} </if>
+            <if test="title!=null and title!=''"> and tt.title like #{title} </if>
+            <if test="dept_id!=null"> and tt.dept_id=#{dept_id} </if>
+            <if test="emp_id!=null"> and tt.emp_id=#{emp_id} </if>
+            <if test="parent_id!=null"> and tt.parent_id=#{parent_id} </if>
+            <if test="parent_no!=null and parent_no!=''"> and tp.task_no=#{parent_no} </if>
+            <if test="cdate!=null"> and tt.cdate=#{cdate} </if>
+            <if test="sdate!=null"> and tt.cdate>#{sdate} </if>
+            <if test="edate!=null"> <![CDATA[and tt.cdate<#{edate} ]]></if>
+            <if test="type!=null"> and tt.type=#{type} </if>
+            <if test="state!=null"> and tt.state=#{state} </if>
+        </trim>
+        order by task_no desc
+    </select>
+
+    <select id="selTaskTypes" resultType="com.aaa.pojo.plans.TbTaskType">
+        select * from tb_task_type
+    </select>
+
+</mapper>

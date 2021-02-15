@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>申请情况</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--防止图片一半显示-->
+<style rel="stylesheet">
+    .layui-table-cell{
+        text-align:center;
+        height: auto;
+        white-space: normal;
+    }
+    .layui-table img{
+        max-width:100%;
+    }
+    .layui-table-cell .layui-form-checkbox [lay-skin="primary"]{
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+<div th:replace="conference/room/apply_search::search"></div>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+<!--每行操作-->
+<!--每行的操作-->
+<script type="text/html" id="propertyDemo">
+    <a class="layui-btn layui-btn-sm" lay-event="gosq">去 审 批</a><br>
+    <a class="layui-btn layui-btn-sm layui-btn-normal" lay-event="goth">撤回申请</a>
+</script>
+<div th:replace="conference/room/cfRoomApproval::cfRoom_approval"></div>
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','form','laydate'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        //初始化日期控件
+        var laydate = layui.laydate;
+
+        var layerId; //用来保存弹出层的id
+        //渲染表格
+        var tableIndex = table.render({
+            elem: '#demo'
+            ,id:'demo'
+            ,height: 600
+            ,url:'[[@{/Conferenceroom/ApplyList}]]'//数据接口
+            ,text:{none:'暂无相关数据'}
+            ,page: true //开启分页
+            ,limit:5
+            ,limits:[5,10,15,20,25,30]
+            ,cols: [
+                [
+                    ,{field:'applyId', title:'申请id', width:155,hide:true}
+                    ,{field:'applyNo', title:'申请编号', width:155}
+                    ,{field:'applyTheme',title:'申请主题',width:200}
+                    ,{field:'conferenceRoomName', title:'会议室名称', width:120}
+                    ,{field:'applyCreateTime', title:'申请时间', width:120}
+                    ,{field:'applyBeginTime', title:'开始时间', width:120}
+                    ,{field:'applyEndTime', title:'结束时间', width:120}
+                    ,{field:'empId', title:'申请人id', width:120,hide:true}
+                    ,{field:'empName', title:'申请人', width:120}
+                    ,{field:'remark', title:'备注', width:120}
+                    ,{
+                    field:'state'
+                    ,title:'申请情况'
+                    ,width:100
+                    ,templet:
+                        function(d){
+                            var rolestr = "";
+                            var ary = d.state;
+                            //1为审批中，2为不通过 ，3为通过 4为过期 5 已用归档
+                            switch (ary) {
+                                case 1: rolestr="审批中"; break;
+                                case 2: rolestr="不通过"; break;
+                                case 3: rolestr="审核通过"; break;
+                                case 4: rolestr="审核过期"; break;
+                                case 5: rolestr="已归档"; break;
+                                case 6: rolestr="申请已撤回"; break;
+                            }
+                            return rolestr;
+                        }
+                }
+                    ,{
+                    field:'conferenceroomApproverVo'
+                    ,title:'审批人'
+                    ,width:200
+                    ,templet:
+                        function(d){
+                            var rolestr = "";
+                            var ary = d.conferenceroomApproverVo;
+                            ary.forEach(function(item,index){
+                                rolestr += " "+item.empName
+                                switch (item.state) {
+                                    case 1: rolestr+=" 状态:未处理 </br>"; break;
+                                    case 2: rolestr+=" 状态:已退回 </br>"; break;
+                                    case 3: rolestr+=" 状态:已同意 </br>"; break;
+                                }
+
+                            });
+                            return rolestr;
+                        }
+                }
+                    ,{toolbar: '#propertyDemo',width:150,fixed:'right',title:'操作',align:'center'}
+                ]
+            ]
+            ,done: function () {
+                $("[data-field='applyId']").css('display','none');
+                $("[data-field='empId']").css('display','none');
+            }
+        });
+        //每行的操作
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "gosq"){
+                $.ajax({
+                    url:'[[@{/Conferenceroom/yanzheng}]]',
+                    async: false,
+                    type:'GET',
+                    dateType:'json',
+                    success:function(res){
+                        if (row.state!=1){
+                            layer.msg("改申请已审批，或已过期，无法继续审批");
+                            return;
+                        }
+                        var pd=0;
+                        $.each(row.conferenceroomApproverVo,function(i,v){//判断当前登录人是否在审批人列表上
+                            if (v.empNo==res){
+                                pd=1;
+                                return;
+                            }
+                        });
+                        if (pd==1){//满足条件调用函数
+                            approval(row);
+                        }else {
+                            layer.msg("您不满足改申请的审核条件");
+                        }
+                    }
+                });
+            }else if(layEvent == "goth"){
+                //先获取id
+                var empId=null;
+                $.ajax({
+                    url:'[[@{/Conferenceroom/getid}]]',
+                    async: false,
+                    type:'GET',
+                    dateType:'json',
+                    success:function(res){
+                        empId=res;
+                    }
+                });
+                if (row.empId!=empId){
+                    layer.msg("这不是您的申请，您无权撤销申请");
+                    return;
+                }
+                if (row.state!=1){
+                    layer.msg("改申请已审批，或已过期，无法再撤回");
+                    return;
+                }
+                var choice=confirm("您确认要撤回改申请吗？", function() { }, null);
+                if (choice==true){
+                    var apply_id =row.applyId;
+                    $.ajax({
+                        url:'[[@{/Conferenceroom/CH}]]',
+                        data:{apply_id:apply_id},
+                        type:'POST',
+                        dataType:'json',
+                        success:function(res){
+                            if(res.code=="0"){
+                                layer.msg(res.message);
+                                window.location.reload();
+                            }else{
+                                layer.msg(res.message);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        //审批
+        function approval(row){
+            layerId = layer.open({
+                type: 1
+                ,title:'修改图书'
+                ,id: 'layerDemo'+Math.random() //防止重复弹出
+                ,content: $('#cfRoomApproval')
+                ,shade: [0.8, '#393D49']
+                ,area:['600px','800px'],
+                success:function(index){
+                    $("#approvalFrom")[0].reset();//清空表单数据
+                    //设置最初的值
+                    //给表单赋值
+                    form.val("approvalFrom", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                        "applyId": row.applyId // "name": "value"
+                        ,"applyNo": row.applyNo
+                        ,"applyTheme": row.applyTheme
+                        ,"conferenceRoomName": row.conferenceRoomName
+                        ,"applyCreateTime": row.applyCreateTime
+                        ,"applyBeginTime": row.applyBeginTime
+                        ,"applyEndTime": row.applyEndTime
+                        ,"empName":row.empName
+                        ,"remark": row.remark
+                    });
+                    form.render();
+                    //先获取当前id
+                    var empId=null;
+                    $.ajax({
+                        url:'[[@{/Conferenceroom/getid}]]',
+                        async: false,
+                        type:'GET',
+                        dateType:'json',
+                        success:function(res){
+                            empId=res;
+                        }
+                    });
+                    //同意修改
+                    form.on('submit(forOK)', function(data){
+                        //获取表单区域所有值
+                        var apply_id = $("#applyId").val();
+                        $.ajax({
+                            url:'[[@{/Conferenceroom/SH}]]',
+                            data:{
+                                empId:empId,
+                                state:3,
+                                apply_id:apply_id
+                            },
+                            type:'POST',
+                            dataType:'json',
+                            success:function(res){
+                                if(res.code=="0"){
+                                    layer.msg(res.message);
+                                    $("#approvalFrom")[0].reset();//清空表单数据
+                                    layer.close(layerId);
+                                    window.location.reload();
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                        return false;
+                    });
+                    //退回修改
+                    form.on('submit(forNO)', function(data){
+                        //获取表单区域所有值
+                        var apply_id = $("#applyId").val();
+                        $.ajax({
+                            url:'[[@{/Conferenceroom/SH}]]',
+                            data:{
+                                empId:empId,
+                                state:2,
+                                apply_id:apply_id
+                            },
+                            type:'POST',
+                            dataType:'json',
+                            success:function(res){
+                                if(res.code=="0"){
+                                    layer.msg(res.message);
+                                    $("#approvalFrom")[0].reset();//清空表单数据
+                                    layer.close(layerId);
+                                    window.location.reload();
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                        return false;
+                    });
+                }
+            });
+        }
+        //刷新多条件查询
+        function refresh(){
+            var applyNo = $("#sapplyNo").val();
+            var conferenceRoomId = $("#sconferenceRoomId").val();
+            var applyBeginTime = $("#sapplyBeginTime").val();
+            var applyEndTime = $("#sapplyEndTime").val();
+            var state = $("#sstate").val();
+            tableIndex.reload(//重载，where后面设置的是传给后台的参数
+                {
+                    where:{
+                        applyNo:applyNo,
+                        conferenceRoomId:conferenceRoomId,
+                        applyBeginTime:applyBeginTime,
+                        applyEndTime:applyEndTime,
+                        state:state
+                    }
+                    ,url:'[[@{/Conferenceroom/ApplyList}]]'
+                    ,method:'get'
+                });
+        }
+        $("#doSearch").click(function(){
+            refresh();
+        });
+    });
+    $(document).ready(function(){
+        //初始调用
+        $.ajax({
+            url:'[[@{/Conferenceroom/List/Apply}]]',
+            async: false,
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var room = "";
+                var emp = "";
+                $.each(res.data[0],function(i,v){
+                    room += "<option value='"+v.conferenceRoomId+"'>"+v.conferenceRoomName+"</option>";
+                });
+                $("#sconferenceRoomId").append(room);
+            }
+        });
+    });
+</script>
+</body>
+</html>

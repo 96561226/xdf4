@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.ConferenceroomApplyMapper">
+    <!--查询的map-->
+    <resultMap id="approverMap" type="com.aaa.pojo.conference.ConferenceroomApplyVo">
+        <result column="apply_id" jdbcType="BIGINT" property="applyId" />
+        <result column="apply_no" jdbcType="VARCHAR" property="applyNo" />
+        <result column="apply_theme" jdbcType="VARCHAR" property="applyTheme" />
+        <result column="conferenceRoom_id" jdbcType="BIGINT" property="conferenceRoomId" />
+        <result column="conferenceRoom_name" jdbcType="VARCHAR" property="conferenceRoomName" />
+        <result column="emp_id" jdbcType="BIGINT" property="empId" />
+        <result column="emp_no" jdbcType="VARCHAR" property="empNo" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="apply_createTime" jdbcType="TIMESTAMP" property="applyCreateTime" />
+        <result column="apply_beginTime" jdbcType="TIMESTAMP" property="applyBeginTime" />
+        <result column="apply_endTime" jdbcType="TIMESTAMP" property="applyEndTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <collection column="apply_id" ofType="com.aaa.pojo.conference.ConferenceroomApproverVo" property="conferenceroomApproverVo" select="com.aaa.springcloud.mapper.ConferenceroomApproverMapper.selCAV">
+            <result column="id" jdbcType="BIGINT" property="id" />
+            <result column="dno" jdbcType="VARCHAR" property="empNo" />
+            <result column="dname" jdbcType="VARCHAR" property="empName" />
+            <result column="dstate" jdbcType="INTEGER" property="state" />
+        </collection>
+    </resultMap>
+    <!--根据审批人id查询 之未审核-->
+    <select id="selApplyByDT" resultMap="approverMap">
+        select sq.*,sqr.emp_no,sqr.emp_name,room.conferenceroom_name
+        from tb_conferenceRoom_apply sq
+        LEFT JOIN tb_emp sqr on sqr.emp_id = sq.emp_id
+        INNER JOIN tb_conferenceroom room ON  room.conferenceroom_id=sq.conferenceroom_id
+        <if test="ymID!=null and ymID!=''">inner JOIN (select tt.apply_id from tb_conferenceRoom_approver tt where tt.emp_id=#{ymID}) ttf on ttf.apply_id = sq.apply_id </if>
+        <trim prefix="where" prefixOverrides="and">
+            <if test="empId!=null and empId!=''">and sq.emp_id=#{empId}</if>
+            <if test="conferenceRoomId!=null and conferenceRoomId!=''">and sq.conferenceRoom_id=#{conferenceRoomId}</if>
+            <if test="applyNo!=null and applyNo!=''">and sq.apply_no=#{applyNo}</if>
+            <if test="applyTheme!=null and applyTheme!=''">and sq.apply_theme=#{applyTheme}</if>
+            <if test="applyBeginTime!=null">and sq.apply_beginTime&gt;=#{applyBeginTime}</if>
+            <if test="applyEndTime!=null">and sq.apply_endTime&lt;=#{applyEndTime}</if>
+            <if test="state!=null and state!=''">and sq.state=#{state}</if>
+        </trim>
+        order by sq.apply_id desc
+    </select>
+    <update id="updTbConferenceroomApp">
+        update tb_conferenceroom_apply set state=#{state} where apply_id=#{apply_id}
+    </update>
+    <insert id="addConferenceroomApp" parameterType="com.aaa.pojo.conference.TbConferenceroomApply">
+        INSERT INTO
+        tb_conferenceRoom_apply(apply_no,apply_theme,conferenceRoom_id,emp_id,apply_createTime,apply_beginTime,apply_endTime,remark,state)
+        VALUES
+        (#{applyNo},#{applyTheme},#{conferenceRoomId},#{empId},#{applyCreateTime},#{applyBeginTime},#{applyEndTime},#{remark},#{state});
+    </insert>
+    <select id="selConferenceroomApplyByTime" resultType="com.aaa.pojo.conference.TbConferenceroomApply">
+        SELECT * FROM tb_conferenceroom_apply
+         WHERE (apply_beginTime&lt;=#{applyBeginTime} AND apply_endTime&gt;=#{applyBeginTime})
+          or  (apply_beginTime&lt;=#{applyEndTime} AND apply_endTime&gt;=#{applyEndTime})
+           HAVING state=#{state} and conferenceRoom_id=#{conferenceRoomId}
+    </select>
+</mapper>

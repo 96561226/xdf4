@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.TransactionMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.Transaction">
+        <result column="transaction_id" jdbcType="INTEGER" property="transaction_id" />
+        <result column="transaction_no" jdbcType="VARCHAR" property="transaction_no" />
+        <result column="menu_name" jdbcType="VARCHAR" property="menu_name" />
+        <result column="menu_url" jdbcType="VARCHAR" property="menu_url" />
+        <result column="parent_id" jdbcType="INTEGER" property="parent_id" />
+        <result column="pname" jdbcType="VARCHAR" property="pname" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.aaa.pojo.Transaction">
+        insert into tb_transaction (transaction_no, menu_name, menu_url, parent_id, type, remark)
+        values (#{transaction_no},#{menu_name},#{menu_url},#{parent_id},#{type},#{remark})
+    </insert>
+
+    <delete id="delTrasaction">
+        delete from tb_transaction where transaction_id=#{transaction_id}
+    </delete>
+
+    <update id="updTrasaction">
+        update tb_transaction
+        <set>
+            <if test="transaction_no != null"> transaction_no = #{transaction_no}, </if>
+            <if test="menu_name != null">menu_name = #{menu_name}, </if>
+            <if test="menu_url != null">menu_url = #{menu_url}, </if>
+            <if test="parent_id != null">parent_id = #{parent_id}, </if>
+            <if test="type != null">type = #{type}, </if>
+            <if test="remark != null">remark = #{remark}, </if>
+            <if test="state != null">state = #{state}, </if>
+        </set>
+        where transaction_id=#{transaction_id}
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select tt.*,tt2.menu_name pname from tb_transaction tt
+        left join tb_transaction tt2 on tt.parent_id = tt2.transaction_id  order by tt.transaction_id
+    </select>
+
+    <select id="selectByLoginNo" resultMap="BaseResultMap">
+        select t.* from tb_emp e
+        inner join tb_roles r
+        on e.role_id = r.role_id
+        inner join tb_transaction_role tr
+        on r.role_id = tr.role_id
+        inner join tb_transaction t
+        on tr.tid = t.transaction_id
+        where e.emp_no = #{EmpNo} and t.state = 1 order by t.transaction_id
+    </select>
+
+    <select id="selectByRoleId" resultMap="BaseResultMap">
+        select t.* from  tb_roles r
+        inner join tb_transaction_role tr
+        on r.role_id = tr.role_id
+        inner join tb_transaction t
+        on tr.tid = t.transaction_id
+        where r.role_id = #{role_id} and t.state = 1 order by t.transaction_id
+    </select>
+
+</mapper>

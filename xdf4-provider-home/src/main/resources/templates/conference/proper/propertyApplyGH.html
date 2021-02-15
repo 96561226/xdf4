@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>资产列表</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--防止图片一半显示-->
+<style rel="stylesheet">
+    .layui-table-cell{
+        text-align:center;
+        height: auto;
+        white-space: normal;
+    }
+    .layui-table img{
+        max-width:100%;
+    }
+    .layui-table-cell .layui-form-checkbox [lay-skin="primary"]{
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="qr">物品归还</a></br>
+</script>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+<div th:replace="conference/proper/propertyApply_search::searchGH"></div>
+<!--表格-->
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+
+<!--函数区-->
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','form','laydate'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        //初始化日期控件
+        var laydate = layui.laydate;
+        var layerId; //用来保存弹出层的id
+
+        //渲染表格
+        var tableIndex = table.render({
+            elem: '#demo'
+            ,id:'demo'
+            ,height: 610
+            ,url: '[[@{/property/selPropertyApplyGH}]]' //数据接口
+            ,text:{none:'暂无相关数据'}
+            ,page: true //开启分页
+            ,limit:5
+            ,limits:[5,10,15,20,25,30]
+            ,cols: [
+                [
+                    ,{field:'applyId', title:'申请id',hide:true}
+                    ,{field:'applyNo',title:'申请编号'}
+                    ,{field:'applyName', title:'申请主题'}
+                    ,{field:'empId', title:'申请人id',hide:true}
+                    ,{field:'empName', title:'申请人'}
+                    ,{field:'empNo', title:'申请人编号'}
+                    ,{field:'propertyId', title:'借用物品id',hide:true}
+                    ,{field:'propertyName', title:'借用物品'}
+                    ,{field:'propertyNo', title:'借用物品编号'}
+                    ,{field:'applyCreateTime', title:'申请时间',width:200}
+                    ,{field:'remark', title:'申请备注'}
+                    ,{field:'state', title:'申请状态'
+                    ,templet: function(d){
+                        var rolestr = "";
+                        var ary = d.state;
+                        // 审核状态（是否通过） 1为审批中，2为不通过，3为通过 4.已借用 5.已归还 6.为已撤回 7.被抢占
+                        switch (ary) {
+                            case 1: rolestr="审批中"; break;
+                            case 2: rolestr="不通过"; break;
+                            case 3: rolestr="已通过"; break;
+                            case 4: rolestr="已借用"; break;
+                            case 5: rolestr="已归还"; break;
+                            case 6: rolestr="已撤回"; break;
+                            case 7: rolestr="被抢占"; break;
+                        }
+                        return rolestr;
+                    }
+                }
+                    ,{field:'propertyApplyVos', title:'审批人',width:200,
+                    templet:
+                        function(d){
+                            var rolestr = "";
+                            var ary = d.propertyApplyVos;
+                            ary.forEach(function(item,index){
+                                rolestr += " "+item.empName
+                                switch (item.state) {
+                                    case 1: rolestr+=" 状态:未处理 </br>"; break;
+                                    case 2: rolestr+=" 状态:已退回 </br>"; break;
+                                    case 3: rolestr+=" 状态:已同意 </br>"; break;
+                                }
+                            });
+                            return rolestr;
+                        }
+                }
+                    ,{toolbar: '#barDemo',fixed:'right',title:'操作',width:200,align:'center'}
+                ]
+            ]
+            ,done: function () {
+                $("[data-field='applyId']").css('display','none');
+                $("[data-field='empId']").css('display','none');
+                $("[data-field='propertyId']").css('display','none');
+            }
+        });
+        //刷新多条件查询
+        function refresh(){
+            var applyNo = $("#sapplyNoGH").val();
+            tableIndex.reload(//重载，where后面设置的是传给后台的参数
+                {
+                    where:{
+                        applyNo:applyNo
+                    }
+                    ,page:{
+                        page:1,
+                        limit:5
+                    }
+                    ,url:'[[@{/property/selPropertyApplyGH}]]'
+                    ,method:'get'
+                });
+        }
+        $("#doSearchGH").click(function(){
+            refresh();
+        });
+        //每行的操作
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "qr"){
+                $.ajax({
+                    url:'[[@{/Conferenceroom/getid}]]',
+                    async: false,
+                    type:'GET',
+                    dataType:'json',
+                    success:function(res){
+                        if(row.state==4){
+                            if (row.empId==res){
+                                var choice=confirm("您确认该物品归还？", function() { }, null);
+                                if (choice==true){
+                                    $.ajax({
+                                        url:'[[@{/property/PropertyXG}]]',
+                                        data:{
+                                            state:5,
+                                            applyId:row.applyId
+                                        },
+                                        type:'POST',
+                                        dataType:'json',
+                                        success:function(res){
+                                            if(res.code=="0"){
+                                                layer.msg(res.message);
+                                                refresh();
+                                            }else{
+                                                layer.msg(res.message);
+                                            }
+                                        }
+                                    });
+                                }
+                            }else {
+                                layer.msg("这不是你借用的物品，您无权操作！");
+                            }
+                        }else {
+                            layer.msg("审核未完成或该物品已归还!");
+                        }
+                    }
+                });
+            }
+        });
+
+    });
+
+</script>
+</body>
+</html>

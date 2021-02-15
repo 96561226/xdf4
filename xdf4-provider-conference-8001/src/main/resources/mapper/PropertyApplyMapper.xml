@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PropertyApplyMapper">
+    <resultMap id="propertyApplyVoMap" type="com.aaa.pojo.conference.PropertyApplyVo">
+        <result column="apply_id" jdbcType="BIGINT" property="applyId" />
+        <result column="apply_no" jdbcType="VARCHAR" property="applyNo" />
+        <result column="apply_name" jdbcType="VARCHAR" property="applyName" />
+        <result column="emp_id" jdbcType="BIGINT" property="empId" />
+        <result column="emp_no" jdbcType="VARCHAR" property="empNo" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="property_id" jdbcType="BIGINT" property="propertyId" />
+        <result column="property_name" jdbcType="VARCHAR" property="propertyName" />
+        <result column="property_no" jdbcType="VARCHAR" property="propertyNo" />
+        <result column="apply_createTime" jdbcType="TIMESTAMP" property="applyCreateTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <collection column="apply_id" ofType="com.aaa.pojo.conference.PropertyApproverVo" property="propertyApplyVos" select="com.aaa.springcloud.mapper.PropertyApproverMapper.selPropertyApproverAll">
+            <result column="id" jdbcType="BIGINT" property="id" />
+            <result column="did" jdbcType="BIGINT" property="empId" />
+            <result column="dno" jdbcType="VARCHAR" property="empNo" />
+            <result column="dname" jdbcType="VARCHAR" property="empName" />
+            <result column="dremark" jdbcType="VARCHAR" property="remark" />
+            <result column="dstate" jdbcType="INTEGER" property="state" />
+        </collection>
+    </resultMap>
+   <select id="selPropertyApplyByDT" resultMap="propertyApplyVoMap">
+        SELECT pa.*,p.property_name,p.property_no,emp.emp_no,emp.emp_name
+        FROM tb_property_apply pa
+        LEFT JOIN tb_emp emp ON pa.emp_id=emp.emp_id
+        LEFT JOIN tb_property p ON pa.property_id=p.property_id
+        <if test="ymID!=null and ymID!=''">LEFT JOIN tb_property_approver par ON pa.apply_id=par.apply_id</if>
+        <trim prefix="where" prefixOverrides="and">
+            <if test="applyId!=null and applyId!=''">and pa.apply_id=#{applyId}</if>
+            <if test="applyNo!=null and applyNo!=''">and pa.apply_no=#{applyNo}</if>
+            <if test="applyName!=null and applyName!=''">and pa.apply_name=#{applyName}</if>
+            <if test="empId!=null and empId!=''">and pa.emp_id=#{empId}</if>
+            <if test="propertyId!=null and propertyId!=''">and property_id=#{propertyId}</if>
+            <if test="state!=null and state!=''">and pa.state=#{state}</if>
+        </trim>
+        <if test="ymID!=null and ymID!=''">GROUP BY apply_id</if>
+        order by apply_id desc
+   </select>
+  <!--  添加-->
+    <insert id="addPropertyApply" parameterType="com.aaa.pojo.conference.TbPropertyApply">
+        INSERT INTO tb_property_apply(apply_no,apply_name,emp_id,property_id,apply_createTime,remark,state)
+        VALUES(#{applyNo},#{applyName},#{empId},#{propertyId},#{applyCreateTime},#{remark},#{state})
+    </insert>
+    <!--修改-->
+    <update id="updPropertyApply">
+        UPDATE tb_property_apply SET state=#{state} WHERE apply_id=#{applyId}
+    </update>
+</mapper>    

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.UtilMapper">
+    <insert id="addIncome" parameterType="com.aaa.pojo.finance.TbIncome">
+        insert into tb_income(income_no, income_date,
+         involve_type, money, gathering,
+         register, emp_id, dept_id, units,
+         income_declare,state)
+        values(
+            #{incomeNo},now(),#{involveType},
+            #{money},1,#{register},#{empId},#{deptId},
+            #{units},#{incomeDeclare},#{state}
+        );
+    </insert>
+    <select id="selemp" resultType="com.aaa.pojo.Emp">
+        SELECT dept_id FROM tb_emp WHERE emp_id=#{empId}
+    </select>
+
+    <resultMap id="tbTaskMap" type="com.aaa.pojo.plans.TbTask">
+        <result column="task_id" jdbcType="BIGINT" property="task_id" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+    </resultMap>
+    <select id="selTask" resultMap="tbTaskMap">
+        SELECT task_id,title FROM tb_task WHERE type=6
+    </select>
+
+    <resultMap id="tbdocumentMap" type="com.aaa.pojo.informaction.Tbdocument">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="dname" jdbcType="VARCHAR" property="dname" />
+    </resultMap>
+    <select id="selDocument" resultMap="tbdocumentMap">
+        SELECT id,dname FROM tb_document WHERE type_id=6
+    </select>
+
+    <resultMap id="tbIncomeMap" type="com.aaa.pojo.finance.TbIncome">
+        <result column="income_id" jdbcType="BIGINT" property="incomeId" />
+        <result column="income_declare" jdbcType="VARCHAR" property="incomeDeclare" />
+        <result column="money" jdbcType="DOUBLE" property="money" />
+    </resultMap>
+    <select id="selIncome" resultMap="tbIncomeMap">
+       SELECT income_id,income_declare,money FROM tb_income WHERE involve_type=4
+    </select>
+</mapper>    

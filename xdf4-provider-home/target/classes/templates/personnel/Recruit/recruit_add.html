@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<style>
+    table td{
+        width: 100px;
+    }
+</style>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <table class="layui-table" id="tab">
+            <tr>
+                <td>申请编号</td>
+                <td colspan="2">
+                    <input disabled type="button" style="width: 100%;text-align: left" id="recruitNo" name="recruitNo"  class="layui-btn layui-btn-primary">
+                </td>
+                <td>*申请主题</td>
+                <td colspan="2">
+                    <input type="text" id="theme" name="theme" required lay-verify="required"  class="layui-input">
+                </td>
+                <td>*申请人</td>
+                <td colspan="2">
+                    <select lay-filter="emp" name="empId" id="empId" lay-search required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>*期望到岗</td>
+                <td colspan="2">
+                    <input type="text" name="arrivalDate" id="arrivalDate" required lay-verify="required" autocomplete="off" class="layui-input">
+                </td>
+                <td>*需求岗位</td>
+                <td colspan="2">
+                    <select lay-filter="role" name="roleId" lay-search id="roleId" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>*需求人数</td>
+                <td colspan="2">
+                    <input name="number" id="number" class="layui-input " value="" placeholder="请输入您需要招聘的人数" autocomplete="off" type="number" required maxlength="11" onKeyUp="this.value=this.value.replace(/[^\.\d]/g,'');this.value=this.value.replace('.','');">
+                </td>
+            </tr>
+            <tr>
+                <td>招聘原因</td>
+                <td colspan="8">
+                    <textarea name="cause" required lay-verify="required" placeholder="请输入您的招聘原因" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>工作内容</td>
+                <td colspan="8">
+                    <textarea name="cause" required lay-verify="required" placeholder="请输入您的工作内容以及职责" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>学历</td>
+                <td colspan="2">
+                    <input type="text" id="education" name="education"  placeholder="请输入您需要的学历要求"  class="layui-input">
+                </td>
+                <td>专业</td>
+                <td colspan="2">
+                    <input type="text" id="major" name="major" placeholder="请输入您需要的专业要求"  class="layui-input">
+                </td>
+                <td>外语要求</td>
+                <td colspan="2">
+                    <input type="text" id="foreignRequire" name="foreignRequire" placeholder="请输入您需要的外语要求"  class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>性别</td>
+                <td colspan="2">
+                    <input type="radio" name="sex" value="男" checked = checked>男
+                    <input type="radio" name="sex" value="女">女
+                    <input type="radio" name="sex" value="不限">不限
+                </td>
+                <td>最小年龄</td>
+                <td colspan="2">
+                    <input name="minAge" id="minAge" class="layui-input " value="" placeholder="请输入您能招聘的最小年龄" autocomplete="off" type="number" required maxlength="11" onKeyUp="this.value=this.value.replace(/[^\.\d]/g,'');this.value=this.value.replace('.','');">
+                </td>
+                <td>最大年龄</td>
+                <td colspan="2">
+                    <input name="maxAge" id="maxAge" class="layui-input " value="" placeholder="请输入您能招聘的最大年龄" autocomplete="off" type="number" required maxlength="11" onKeyUp="this.value=this.value.replace(/[^\.\d]/g,'');this.value=this.value.replace('.','');">
+                </td>
+            </tr>
+            <tr>
+                <td>*经验要求</td>
+                <td colspan="8">
+                    <textarea name="experience" required lay-verify="required" placeholder="请输入需要拥有的经验" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+        </table>
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批人</label>
+            <div id="charge_emp_ids" name="charge_emp_ids" class="demo-transfer"></div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.demo.mapper.OutLinkmanMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.informaction.TboutlinkmanVo">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <association column="typeid" javaType="com.aaa.pojo.informaction.TboutlinkmanType" property="type">
+            <id column="typeid" jdbcType="INTEGER" property="typeid" />
+        </association>
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aaa.pojo.informaction.SearchOutlinkman">
+        SELECT o.*,t.typename FROM tb_outlinkman o
+        LEFT JOIN tb_outlinkman_type t
+        ON o.typeid=t.typeid
+        <trim prefix="where" prefixOverrides="and">
+            <if test="id != null">
+                and o.id = #{id}
+            </if>
+            <if test="typeid != null">
+                and o.typeid = #{typeid}
+            </if>
+        </trim>
+    </select>
+
+    <select id="findByID" parameterType="int" resultType="com.aaa.pojo.informaction.Tboutlinkman">
+        select * from tb_outlinkman where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.aaa.pojo.informaction.Tboutlinkman">
+        insert into tb_outlinkman (linkname,title,institution,gphone,yphone,typeid)
+        values (#{linkname}, #{title},#{institution},
+        #{gphone}, #{yphone},#{typeid})
+    </insert>
+
+    <delete id="del" parameterType="int">
+        delete from tb_outlinkman where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.aaa.pojo.informaction.Tboutlinkman">
+        update tb_outlinkman set linkname = #{linkname},title = #{title},
+        institution = #{institution},gphone = #{gphone},yphone = #{yphone},
+        typeid = #{typeid}
+        where id = #{id}
+    </update>
+</mapper>

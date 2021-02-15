@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+    <form class="layui-form"  id="statementForm" lay-filter="statementForm" type="post">
+        <div class="layui-container-auto">
+            <div class="layui-row">
+                <!--       充当偏移位置         -->
+                <div class="layui-col-md2"><div class="layui-form-item"></div></div>
+                <div class="layui-col-md6">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">报告名称</label>
+                        <div class="layui-input-block">
+                            <input id="dtitle" type="text" name="dtitle" readonly class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-md5">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">报告分类</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="dtype_name" name="dtype_name"  readonly   class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md5">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">从属于</label>
+                        <div class="layui-input-block">
+                            <input id="dpname" type="text" name="dpname" readonly class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-md5">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">创建人</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="demp_name" name="emp_name"  readonly   class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md5">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">所属部门</label>
+                        <div class="layui-input-block">
+                            <input id="ddept_name" type="text" name="ddept_name" readonly class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-md5">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">评审人</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="dcgarge" name="dcgarge"  readonly   class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-md1"><div class="layui-form-item"></div></div>
+                <div class="layui-col-md9">
+                    <table class="layui-table" id="statement_detail"></table>
+                </div>
+            </div>
+        </div>
+
+        <div id="dstatement_state"></div>
+        <div id="dstatement_state2"></div>
+
+
+
+    </form>
+
+</div>
+</body>
+</html>

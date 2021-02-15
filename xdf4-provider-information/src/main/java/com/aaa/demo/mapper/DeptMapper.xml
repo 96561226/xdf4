@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.demo.mapper.DeptMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.Dept">
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from tb_dept
+    </select>
+</mapper>

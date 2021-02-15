@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.entry.EntryMapper">
+    <resultMap id="tbEntryVoMap" type="com.aaa.pojo.personnel.TbEntryVo">
+        <result column="entry_id" jdbcType="INTEGER" property="entryId" />
+        <result column="entry_no" jdbcType="VARCHAR" property="entryNo" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="te_emp_name" jdbcType="VARCHAR" property="teEmpName" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="theme" jdbcType="VARCHAR" property="theme" />
+        <result column="dept_id" jdbcType="INTEGER" property="deptId" />
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+        <result column="role_id" jdbcType="INTEGER" property="roleId" />
+        <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+        <result column="birthday" jdbcType="DATE" property="birthday" />
+        <result column="entry_date" jdbcType="DATE" property="entryDate" />
+        <result column="sex" jdbcType="VARCHAR" property="sex" />
+        <result column="school" jdbcType="VARCHAR" property="school" />
+        <result column="education" jdbcType="VARCHAR" property="education" />
+        <result column="major" jdbcType="VARCHAR" property="major" />
+        <result column="term" jdbcType="VARCHAR" property="term" />
+        <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+        <result column="apply_date" jdbcType="DATE" property="applyDate" />
+        <result column="end_date" jdbcType="DATE" property="endDate" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="fstate_name" jdbcType="VARCHAR" property="stateName" />
+        <collection property="entryNotifyVos" ofType="com.aaa.pojo.personnel.TbEntryNotify"
+                    column="entry_id" select="com.aaa.mapper.entry.EntryNotifyMapper.selectEntryNotifys">
+            <id column="id" jdbcType="INTEGER" property="id"></id>
+        </collection>
+        <collection property="entryApproverVos" ofType="com.aaa.pojo.personnel.TbEntryApprover"
+                    column="entry_id" select="com.aaa.mapper.entry.EntryApproverMapper.selectEntryApprovers">
+            <id column="id" jdbcType="INTEGER" property="id" ></id>
+        </collection>
+    </resultMap>
+<!--  添加  -->
+    <insert id="addEntry" parameterType="com.aaa.pojo.personnel.TbEntry">
+        insert into tb_entry(
+            entry_no,emp_id,emp_name,theme,
+            dept_id,role_id,birthday,
+            entry_date, sex, school, education,
+            major, term, remarks,
+            apply_date
+        )VALUES(
+            #{entryNo},#{empId},#{empName},#{theme},
+            #{deptId},#{roleId},#{birthday},#{entryDate},#{sex},#{school},#{education},
+            #{major},#{term},#{remarks},curdate()
+        )
+    </insert>
+<!--  作废  -->
+    <update id="updateEntry" parameterType="com.aaa.pojo.personnel.TbEntry">
+        update tb_entry set end_date = curdate(),state = #{state} where entry_id = #{entryId}
+    </update>
+    <select id="selNo" parameterType="java.lang.String" resultType="java.lang.String">
+        select CONCAT(#{noName},(select right(1000000+(select max(entry_id)+1 from tb_entry),6)))
+    </select>
+<!--  条件查询  -->
+    <select id="selectEntry" parameterType="com.aaa.pojo.personnel.SearchEntry" resultMap="tbEntryVoMap">
+
+        select entry.*,fs.fstate_name,emp.emp_name te_emp_name,dept.dept_name,role.role_name
+        from tb_entry entry
+        left join tb_form_state fs
+        on entry.state = fs.state_id
+        left join tb_emp emp
+        on entry.emp_id = emp.emp_id
+        left join tb_dept dept
+        on entry.dept_id = dept.dept_id
+        left join tb_roles role
+        on entry.role_id = role.role_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="entryId != null">
+                and entry.entry_Id = #{entryId}
+            </if>
+            <if test="entryNo != null">
+                and entry.entry_no like "%"#{entryNo}"%"
+            </if>
+            <if test="empId != null">
+                and entry.emp_id = #{empId}
+            </if>
+            <if test="deptId != null">
+                and entry.dept_id = #{deptId}
+            </if>
+            <if test="roleId != null">
+                and entry.role_id = #{roleId}
+            </if>
+            <if test="state != null">
+                and entry.state = #{state}
+            </if>
+        </trim>
+        order by entry.entry_id desc
+    </select>
+
+</mapper>

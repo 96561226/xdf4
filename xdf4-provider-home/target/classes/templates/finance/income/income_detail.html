@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>详细信息</legend>
+        <table lay-even class="layui-table" id="content" lay-filter="content"></table><br/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="dincomeNo" name="incomeNo"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">日期</label>
+            <div class="layui-input-block">
+                <input type="text" id="dincomeDate" name="incomeDate"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">收支类型</label>
+            <div class="layui-input-block">
+                <input type="text" id="dpaymentType" name="paymentType"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">金额</label>
+            <div class="layui-input-block">
+                <input type="text" id="dmoney" name="money"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">收款方式</label>
+            <div class="layui-input-block">
+                <input type="text" id="dgatheringName" name="gatheringName"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">登记人</label>
+            <div class="layui-input-block">
+                <input type="text" id="dregisterName" name="registerName"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">收支人</label>
+            <div class="layui-input-block">
+                <input type="text" id="dempName" name="empName"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">部门</label>
+            <div class="layui-input-block">
+                <input type="text" id="ddeptName" name="deptName"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">对方单位</label>
+            <div class="layui-input-block">
+                <input type="text" id="dunits" name="units"  readonly  placeholder="无"  class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">关联合同</label>
+            <div class="layui-input-block">
+                <input type="text" id="dcontractNo" name="contractNo"  readonly placeholder="无关联合同"  class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">收支说明</label>
+            <div class="layui-input-block">
+                <input type="text" id="dincomeDeclare" name="incomeDeclare"  readonly   class="layui-input">
+            </div>
+        </div>
+    </fieldset>
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <label class="layui-form-label">部门名称</label>
+            <div class="layui-inline">
+                <input id="dept_id" type="hidden" name="dept_id" placeholder="部门ID" autocomplete="off" class="layui-input">
+                <input id="dept_name" type="text" name="dept_name" required lay-verify="required" placeholder="部门名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">部门编号</label>
+                    <div class="layui-inline">
+                        <input type="text" id="dept_no" name="dept_no" required  lay-verify="required" placeholder="请输入部门编号" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">部门类型</label>
+                    <div class="layui-input-block">
+                        <select name="type" lay-filter="type" id="type" lay-verify="required">
+                            <option value="0">最高组织</option>
+                            <option value="1">部门</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">部门坐标</label>
+                    <div class="layui-inline">
+                        <input type="text" id="dept_loc" name="dept_loc" required  lay-verify="required" placeholder="请输入部门坐标" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属部门</label>
+                    <div class="layui-input-block">
+                        <select name="parent_id" lay-filter="parent_id" id="parent_id" lay-verify="required">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

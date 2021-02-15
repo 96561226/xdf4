@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>会议室查询</title>
+</head>
+<body>
+<form action="" class="layui-form" method="get" id="searchFrm" lay-filter="searchFrm" th:fragment="search">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">采购标号:</label>
+            <div class="layui-input-inline">
+                <input type="text" id="spurchaseNo" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">资产类别:</label>
+            <div class="layui-input-inline">
+                <select lay-filter="stypeId" id="stypeId">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">采购申请状态:</label>
+            <div class="layui-input-inline">
+                <select lay-filter="sstateId" id="sstateId">
+                    <option value="">请选择</option>
+                    <option value="1">审批中</option>
+                    <option value="2">不通过</option>
+                    <option value="3">采购中</option>
+                    <option value="4">采购完成</option>
+                    <option value="5">已添加</option>
+                    <option value="6">申请已撤回</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">是否可借用:</label>
+            <div class="layui-input-inline">
+                <select lay-filter="spurchaseState" id="spurchaseState">
+                    <option value="">请选择</option>
+                    <option value="1">可借用</option>
+                    <option value="2">不可借用</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item" style="text-align: center;">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-icon layui-icon-search" id="doSearch">查询</button>
+            <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm layui-icon layui-icon-refresh">重置</button>
+        </div>
+    </div>
+</form>
+
+</body>
+</html>

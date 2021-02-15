@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.EmpMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.Emp">
+        <id column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        <result column="emp_no" jdbcType="VARCHAR" property="emp_no" />
+        <result column="emp_name" jdbcType="VARCHAR" property="emp_name" />
+        <result column="role_id" jdbcType="INTEGER" property="role_id" />
+        <result column="mgr" jdbcType="INTEGER" property="mgr" />
+        <result column="hiredate" jdbcType="DATE" property="hiredate" />
+        <result column="sal" jdbcType="DOUBLE" property="sal" />
+        <result column="comm" jdbcType="DOUBLE" property="comm" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="pwd" jdbcType="VARCHAR" property="pwd" />
+    </resultMap>
+
+    <resultMap id="eV" type="com.aaa.pojo.EmpVo">
+        <id column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        <result column="emp_no" jdbcType="VARCHAR" property="emp_no" />
+        <result column="emp_name" jdbcType="VARCHAR" property="emp_name" />
+        <result column="role_id" jdbcType="INTEGER" property="role_id" />
+        <result column="role_name" jdbcType="VARCHAR" property="role_name" />
+        <result column="mgr" jdbcType="INTEGER" property="mgr" />
+        <result column="mgr_name" jdbcType="VARCHAR" property="mgr_name" />
+        <result column="hiredate" jdbcType="DATE" property="hiredate" />
+        <result column="sal" jdbcType="DOUBLE" property="sal" />
+        <result column="comm" jdbcType="DOUBLE" property="comm" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.aaa.pojo.Emp">
+        insert into tb_emp (emp_no,emp_name,role_id,mgr,hiredate,sal,comm,dept_id,pwd)
+        values (#{emp_no},#{emp_name},#{role_id},#{mgr},#{hiredate},#{sal},#{comm},#{dept_id},#{pwd})
+    </insert>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from tb_emp
+    </select>
+
+    <select id="selectByNoPwd" resultMap="BaseResultMap">
+        select * from tb_emp where emp_no=#{emp_no} and pwd=#{pwd}
+    </select>
+
+    <select id="selectByNo" resultMap="BaseResultMap">
+        select * from tb_emp where emp_no=#{emp_no}
+    </select>
+
+    <select id="selectEmpByDept" resultMap="BaseResultMap">
+        select * from tb_emp where dept_id = #{dept_id}
+    </select>
+
+    <update id="updatePwd" parameterType="com.aaa.pojo.Emp">
+        update tb_emp set pwd = #{pwd} where emp_no = #{empNo}
+    </update>
+
+    <select id="selectSeaEmp" resultMap="eV" parameterType="com.aaa.searchpojo.SearchEmp">
+        select te.*,td.dept_name,te2.emp_name mgr_name,tr.role_name
+         from tb_emp te
+         left join tb_dept td on te.dept_id = td.dept_id
+         left join tb_emp te2 on te.mgr = te2.emp_id
+         left join tb_roles tr on te.role_id = tr.role_id
+        <where>
+            <if test="emp_id!=null"> te.emp_id = #{emp_id} </if>
+            <if test="emp_no!=null and emp_no!=''"> and te.emp_no = #{emp_no} </if>
+            <if test="emp_name!=null and emp_name!=''"> and te.emp_name like #{emp_name} </if>
+            <if test="role_id!=null"> and te.role_id = #{role_id} </if>
+            <if test="mgr!=null"> and te.mgr = #{mgr} </if>
+            <if test="sdate!=null"> and te.hiredate > #{sdate} </if>
+            <if test="edate!=null"><![CDATA[ and te.hiredate < #{edate} ]]></if>
+            <if test="sal!=null"> and te.sal = #{sal} </if>
+            <if test="comm!=null"> and te.comm = #{comm} </if>
+            <if test="dept_id!=null"> and te.dept_id = #{dept_id} </if>
+            <if test="state!=null"> and te.state = #{state} </if>
+            <if test="state==null"> and te.state = 1 </if>
+        </where>
+    </select>
+
+    <update id="updEmp" parameterType="com.aaa.pojo.Emp">
+        update tb_emp
+        <set>
+            <if test="emp_no!=null and emp_no!=''"> emp_no = #{emp_no}, </if>
+            <if test="emp_name!=null and emp_name!=''"> emp_name = #{emp_name}, </if>
+            <if test="role_id!=null"> role_id = #{role_id}, </if>
+            <if test="mgr!=null"> mgr = #{mgr}, </if>
+            <if test="hiredate!=null"> hiredate = #{hiredate}, </if>
+            <if test="sal!=null"> sal = #{sal}, </if>
+            <if test="comm!=null"> comm = #{comm}, </if>
+            <if test="dept_id!=null"> dept_id = #{dept_id}, </if>
+            <if test="state!=null"> state = #{state} </if>
+        </set>
+        where emp_id = #{emp_id}
+    </update>
+
+    <delete id="delEmp">
+        delete from tb_emp where emp_id = #{emp_id}
+    </delete>
+
+</mapper>

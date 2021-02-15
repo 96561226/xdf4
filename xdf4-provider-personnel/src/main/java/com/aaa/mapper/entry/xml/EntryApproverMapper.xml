@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.entry.EntryApproverMapper">
+
+    <resultMap id="tbEntryApproverVoMap" type="com.aaa.pojo.personnel.TbEntryApproverVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="entry_id" jdbcType="INTEGER" property="entryId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <select id="selectEntryApprovers" parameterType="Integer" resultMap="tbEntryApproverVoMap">
+        select approver.*,emp.emp_name,tas.state_name  from tb_entry_approver approver
+            left join tb_emp emp
+            on approver.emp_id = emp.emp_id
+            left join tb_approver_state tas
+            on approver.state = tas.state_id
+            where approver.entry_id = #{id}
+    </select>
+
+    <insert id="insertEntryApprover" parameterType="com.aaa.pojo.personnel.TbEntryApprover">
+        insert into tb_entry_approver(
+            entry_id,emp_id,remark
+        )values(
+            #{entryId},#{empId},#{remark}
+        );
+    </insert>
+
+    <update id="updateState" parameterType="com.aaa.pojo.personnel.TbEntryApprover">
+        update tb_entry_approver
+        set state = 2
+        where entry_id = #{entryId}
+        and emp_id = #{empId}
+    </update>
+</mapper>

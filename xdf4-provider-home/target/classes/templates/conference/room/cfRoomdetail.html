@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="cfRoomdetail" style="display: none;padding: 20px;" th:fragment="cfRoomdetail_common">
+<form class="layui-form">
+    <div class="layui-form-item" style="display: none;" id="fid">
+        <label class="layui-form-label">会议室id</label>
+        <div class="layui-input-block">
+            <input id="dconferenceRoomId" type="text" name="conferenceRoomId" readonly class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">会议室编号</label>
+        <div class="layui-input-block">
+            <input type="text" id="dconferenceRoomNo" name="dconferenceRoomNo"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">会议室名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="dconferenceRoomName" name="conferenceRoomName"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="display: inline-block;">状态</label>
+        <div class="layui-input-block">
+        <input type="text" id="dstate" name="state"  readonly  class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="display: inline-block;">设备</label>
+        <div class="layui-input-block">
+            <input type="text" id="dpropertys" name="propertys"  readonly  class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">宣传图片</label>
+        <div class="layui-input-block">
+            <img class="layui-upload-img" id="dconferenceRoomPic" style="width:50px;height:50px;border-radius: 25px; text-align: center;">
+        </div>
+    </div>
+    <table lay-even class="layui-table" id="useQK" lay-filter="useQK"></table>
+</form>
+</div>
+
+<div style="display: none;padding: 20px;" id="CFproperty" th:fragment="cfRoomdetail_property">
+    <table lay-even class="layui-table" id="tbproperty" lay-filter="tbproperty"></table>
+</div>
+</body>
+</html>

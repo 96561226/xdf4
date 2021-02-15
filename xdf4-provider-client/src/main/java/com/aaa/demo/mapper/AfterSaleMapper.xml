@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.demo.mapper.AfterSaleMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.client.TbafterSaleVo">
+        <id column="c_id" jdbcType="INTEGER" property="c_id" />
+        <association column="c_id" javaType="com.aaa.pojo.client.Tbclient" property="tbclient">
+            <id column="c_id" jdbcType="INTEGER" property="c_id" />
+        </association>
+        <association column="typeid" javaType="com.aaa.pojo.client.TbafterType" property="type">
+            <id column="typeid" jdbcType="INTEGER" property="typeid" />
+        </association>
+        <association column="emp_id" javaType="com.aaa.pojo.Emp" property="emp">
+            <id column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        </association>
+        <association column="dept_id" javaType="com.aaa.pojo.Dept" property="dept">
+            <id column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        </association>
+        <association column="p_id" javaType="com.aaa.pojo.client.TbPact" property="pact">
+            <id column="p_id" jdbcType="INTEGER" property="p_id" />
+        </association>
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aaa.pojo.client.SearchPact">
+        SELECT a.*,e.emp_name,d.dept_name,c.cname,t.typename,s.state_name,p.pname FROM tb_afterSale a
+        LEFT JOIN tb_emp e
+        ON a.emp_id=e.emp_id
+        LEFT JOIN tb_dept d
+        ON a.dept_id=d.dept_id
+        LEFT JOIN tb_client c
+        ON a.c_id=c.c_id
+        LEFT JOIN tb_afterSale_type t
+        ON a.typeid=t.typeid
+        LEFT JOIN tb_afterSale_state s
+        ON a.state=s.id
+        LEFT JOIN tb_pact p
+        ON a.p_id=p.p_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="theme != null and theme!=''">
+                and a.theme like "%"#{theme}"%"
+            </if>
+            <if test="typeid != null">
+                and a.typeid =#{typeid}
+            </if>
+            <if test="state != null">
+                and a.state =#{state}
+            </if>
+        </trim>
+        order by a.s_id desc
+    </select>
+
+    <select id="selState" resultType="com.aaa.pojo.client.TbAfterState">
+        select * from tb_afterSale_state
+    </select>
+
+    <select id="findByID" parameterType="int" resultType="com.aaa.pojo.client.TbafterSale">
+        select * from tb_afterSale where s_id = #{s_id}
+    </select>
+
+
+    <update id="update" parameterType="integer">
+        update tb_afterSale set state = 3
+        where s_id = #{s_id}
+    </update>
+</mapper>

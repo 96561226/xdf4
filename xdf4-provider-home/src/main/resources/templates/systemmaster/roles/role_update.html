@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <label class="layui-form-label">角色名称</label>
+            <div class="layui-inline">
+                <input id="role_id" type="hidden" name="role_id" placeholder="角色ID" autocomplete="off" class="layui-input">
+                <input id="role_name" type="text" name="role_name" required lay-verify="required" placeholder="角色名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">角色描述</label>
+                    <div class="layui-inline">
+                        <input type="text" id="role_des" name="role_des" required  lay-verify="required" placeholder="请输入关于角色描述" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属部门</label>
+                    <div class="layui-input-block">
+                        <select name="dept_id" lay-filter="dept_id" id="dept_id" lay-verify="required">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>资产维护</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--维修-->
+<div style="display: none;padding: 20px;" id="propertyUpdate" th:fragment="perperty_Update">
+    <id class="layui-form-item">
+        <h3>资产维护修改</h3>
+        <h5 style="color:red;">*1.借用中的物品不可修改</h5>
+        <h5 style="color:red;">*2.禁止手动把物品状态修改为使用中</h5>
+    </id>
+    <form class="layui-form" id="propertyFrom" lay-filter="propertyFrom" type="post">
+        <h5>不可修改</h5>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">资产id</label>
+            <div class="layui-input-block">
+                <input type="text" id="propertyId" name="propertyId" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="propertyNo" name="propertyNo" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="propertyName" name="propertyName" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产购买时间</label>
+            <div class="layui-input-block">
+                <input type="text" id="propertyBuytime" name="propertyBuytime" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">供应商</label>
+            <div class="layui-input-block">
+                <input type="text" id="propertyManufacturer" name="propertyManufacturer" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产价值</label>
+            <div class="layui-input-block">
+                <input type="text" id="propertyUnivalence" name="propertyUnivalence" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <h5>可修改</h5>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否可借用</label>
+            <div class="layui-input-block">
+                <select id="propertyState" name="propertyState" lay-filter="aihao" lay-verify="title">
+                    <option value="">请选择</option>
+                    <option value="1">可借用</option>
+                    <option value="2">不可借用</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">暂存地点</label>
+            <div class="layui-input-block">
+                <input type="text" id="propertyPlace" name="propertyPlace" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产类型</label>
+            <div class="layui-input-block">
+                <select id="typeId" name="typeId" lay-filter="aihao" lay-verify="title">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产状态</label>
+            <div class="layui-input-block">
+                <select id="stateId" name="stateId" lay-filter="aihao" lay-verify="title">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--申请-->
+<div style="display: none;padding: 20px;" id="propertySQ" th:fragment="property_SQ">
+    <id class="layui-form-item"><h3>物品申请</h3></id>
+    <form class="layui-form" id="propertySQFrom" lay-filter="propertySQFrom" type="post">
+        <h5>申请基本信息</h5>
+        <h6 style="color: red">*注意申请人默认为当前登陆人</h6>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label" >申请的物品id</label>
+            <div class="layui-input-block">
+                <input type="text" id="SQpropertyId" name="SQpropertyId" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">申请人id</label>
+            <div class="layui-input-block">
+                <input type="text" id="empId" name="empId" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyNo" name="applyNo" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请时间</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyCreateTime" name="applyCreateTime" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请物品</label>
+            <div class="layui-input-block">
+                <input type="text" id="SQpropertyName" name="SQpropertyName" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+
+        <h5>完善信息</h5>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请主题</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyName" name="applyName" lay-verify="title" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批人</label>
+            <div id="action_emp_ids" name="action_emp_ids" class="demo-transfer" lay-verify="csk"></div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="remark" name="remark" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="SPDemo" id="bt2">立即申请</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>会议室申请</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<style>
+    input{
+        width: 99%;
+        height: 100%;
+    }
+    table{
+        width: 100%;
+        height: 90%;
+    }
+</style>
+
+<body>
+<div style="display: none;padding: 20px;" id="cfRoomaddOrUpdate" th:fragment="cfRoom_addOrUpdate">
+    <id class="layui-form-item"><h3>会议室申请</h3>
+        <h5 style="color: red">*1.该页面全为必填选项</h5>
+        <h5 style="color: red">*2.申请人为当前登录校角色</h5>
+        <h5 style="color: red">*3.审批人尽量不要超过3个</h5>
+    </id>
+    <form class="layui-form" id="cfToomFrom" lay-filter="cfToomFrom" type="post">
+        <div class="layui-form-item">
+            <label class="layui-form-label" >申请编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyNo" name="applyNo" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请主题</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyTheme" name="applyTheme" lay-verify="title" autocomplete="off" placeholder="实例：测试员(员工)20201130(日期)申请" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">申请员工</label>
+            <div class="layui-input-block">
+                <input type="text" id="empId" name="empId"  autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">会议室</label>
+            <div class="layui-input-block">
+                <select id="conferenceRoomId" name="conferenceRoomId" lay-filter="aihao" lay-verify="title">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline" style="display: none">
+            <label class="layui-form-label">创建时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="applyCreateTime" name="applyCreateTime" >
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="applyBeginTime" name="applyBeginTime" lay-verify="bgtime" placeholder="yyyy-MM-dd HH:mm">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">结束时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="applyEndTime" name="applyEndTime"  lay-verify="edtime"  placeholder="yyyy-MM-dd HH:mm">
+            </div>
+        </div>
+        </br>
+        </br>
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批人</label>
+            <div id="action_emp_ids" name="action_emp_ids" class="demo-transfer"  lay-verify="csk"></div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">普通文本域</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="remark" name="remark" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div style="display: none;padding: 20px;" id="addproperty" th:fragment="cfRoom_property">
+    <id class="layui-form-item"><h3>设备</h3></id>
+    <form class="layui-form" id="propertyFrom" lay-filter="propertyFrom" type="post">
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">房间</label>
+            <div class="layui-input-block">
+                <input type="text" id="proconferenceRoomId" name="conferenceRoomId" lay-verify="title" autocomplete="off" placeholder="实例：测试员(员工)20201130(日期)申请" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">当前可用设备</label>
+            <div class="layui-input-block">
+                <select id="propertyId" name="propertyId" lay-filter="aihao" lay-verify="title">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemoppt" id="bt3">立即提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

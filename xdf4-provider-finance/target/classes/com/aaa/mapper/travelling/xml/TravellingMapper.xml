@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.travelling.TravellingMapper">
+    <resultMap id="tbTravellingMap" type="com.aaa.pojo.finance.TbTravelling">
+        <result column="travelling_id" jdbcType="INTEGER" property="travellingId" />
+        <result column="travelling_no" jdbcType="VARCHAR" property="travellingNo" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="dept_id" jdbcType="INTEGER" property="deptId" />
+        <result column="apply_date" jdbcType="DATE" property="applyDate" />
+        <result column="cause" jdbcType="VARCHAR" property="cause" />
+        <result column="accessory" jdbcType="VARCHAR" property="accessory" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+    </resultMap>
+<!--  添加  -->
+    <insert id="addTravelling" parameterType="com.aaa.pojo.finance.TbTravelling">
+        insert into tb_travelling(travelling_no,emp_id,dept_id,apply_date,cause,accessory)
+        values(#{travellingNo},#{empId},#{deptId},#{applyDate},#{cause},#{accessory})
+    </insert>
+
+    <select id="selectDeptIdByEmpId" parameterType="Long" resultType="java.lang.Long">
+        select dept_id from tb_emp where emp_id = #{empId}
+    </select>
+<!--  修改状态  -->
+    <update id="updateTravelling" parameterType="com.aaa.pojo.finance.TbTravelling">
+        update tb_travelling set state = #{state} where travelling_id = #{travellingId}
+    </update>
+    <resultMap id="tbTravellingVoMap" type="com.aaa.pojo.finance.TbTravellingVo">
+        <result column="travelling_id" jdbcType="INTEGER" property="travellingId" />
+        <result column="travelling_no" jdbcType="VARCHAR" property="travellingNo" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="dept_id" jdbcType="INTEGER" property="deptId" />
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+        <result column="apply_date" jdbcType="DATE" property="applyDate" />
+        <result column="cause" jdbcType="VARCHAR" property="cause" />
+        <result column="accessory" jdbcType="VARCHAR" property="accessory" />
+        <result column="approverId" jdbcType="INTEGER" property="approverId"/>
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="fstate_name" jdbcType="VARCHAR" property="stateName" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <collection property="approverName" ofType="com.aaa.pojo.finance.TbTravellingApproverVo"
+                    column="travelling_id" select="com.aaa.mapper.travelling.TravellingApproverMapper.selectAllApproverByTravellingId">
+            <id column="id" jdbcType="INTEGER" property="id"></id>
+        </collection>
+        <collection property="travellingNotifies" ofType="com.aaa.pojo.finance.TbTravellingNotify"
+                    column="travelling_id" select="com.aaa.mapper.travelling.TravellingNotifyMapper.selectTravellingNotify">
+            <id column="id" jdbcType="INTEGER" property="id" ></id>
+        </collection>
+        <collection property="travellingContents" ofType="com.aaa.pojo.finance.TbTravellingContent"
+                    column="travelling_id" select="com.aaa.mapper.travelling.TravellingContentMapper.selectTravellingContent">
+            <id column="id" jdbcType="INTEGER" property="id"></id>
+        </collection>
+    </resultMap>
+<!--  条件查询  -->
+    <select id="selectTravelling" parameterType="com.aaa.pojo.finance.SearchTravelling" resultMap="tbTravellingVoMap">
+        select
+        travelling.*,emp.emp_name,dept.dept_name,tfs.fstate_name
+        from tb_travelling travelling
+        left join tb_emp emp
+            on travelling.emp_id = emp.emp_id
+        left join tb_dept dept
+            on travelling.dept_id = dept.dept_id
+        left join tb_form_state tfs
+            on travelling.state = tfs.state_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="travellingId != null">
+                and travelling.travelling_id = #{travellingId}
+            </if>
+            <if test="travellingNo != null">
+                and travelling.travelling_no like "%"#{travellingNo}"%"
+            </if>
+            <if test="empId != null">
+                and travelling.emp_id = #{empId}
+            </if>
+            <if test="deptId != null">
+                and travelling.dept_id = #{deptId}
+            </if>
+            <if test="state != null">
+                and travelling.state = #{state}
+            </if>
+        </trim>
+        order by travelling.travelling_id desc
+    </select>
+</mapper>

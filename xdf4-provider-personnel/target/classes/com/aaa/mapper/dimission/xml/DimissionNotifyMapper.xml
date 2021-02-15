@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.dimission.DimissionNotifyMapper">
+    <resultMap id="tbDimissionNotifyVoMap" type="com.aaa.pojo.personnel.TbDimissionNotifyVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="dimission_id" jdbcType="INTEGER" property="dimissionId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    </resultMap>
+    <select id="selectDimissionNotifys" parameterType="Long" resultMap="tbDimissionNotifyVoMap">
+         select * from tb_dimission_notify notify
+         left join tb_emp emp
+         on notify.emp_id = emp.emp_id
+         where notify.dimission_id = #{id}
+    </select>
+    <insert id="insertDimissionNotify" parameterType="com.aaa.pojo.personnel.TbRecruitNotify">
+        insert into tb_dimission_notify(
+        dimission_id,emp_id)
+        values(#{dimissionId},#{empId})
+    </insert>
+</mapper>

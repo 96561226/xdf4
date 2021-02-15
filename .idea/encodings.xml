@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-eureka-server7001" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloud-eureka-server7002" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-api-commons" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-api-dao" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-client" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-conference-8001" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-finance" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-home" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-information" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-personnel" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-plan2077" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xdf4-provider-systemmaster" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

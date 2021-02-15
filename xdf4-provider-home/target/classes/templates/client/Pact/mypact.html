@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示我的合同</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--当前员工id-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+<div th:replace="client/Pact/client_search::search"></div>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+
+<!--表头的操作-->
+<script type="text/html" id="headBar">
+    <a class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-circle" style="color:red;"></i>添加</a>
+</script>
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit" style="color:pink;"></i>作废</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="aftersale">追加售后服务</a>
+</script>
+<!--添加和修改的弹出层-->
+<div th:replace="client/Pact/addOrSave::addOrUpdate"></div>
+<div th:replace="client/Pact/addAfter::addAfter"></div>
+<div th:replace="client/Pact/detail::detail_common"></div>
+<script type="text/html" id="plan_spxz">
+    {{#  if(d.state_id === 5){ }}
+    <div class="layui-form-item">
+        <label class="layui-form-label">审批选择</label>
+        <div class="layui-input-block">
+            <input class="radio" type="radio" lay-filter="formstate" name="formstate" value="1" checked="checked"/>通过 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input class="radio" type="radio" lay-filter="formstate" name="formstate" value="3" />撤除
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="plan_sub" >审批确认</button>
+        </div>
+    </div>
+    {{#  } }}
+
+</script>
+<script type="text/javascript">
+layui.use(['table','jquery','layer','upload','transfer','laytpl','form','laydate'],function(){
+    var $ = layui.jquery;
+    var table = layui.table;
+    var layer = layui.layer;
+    var upload = layui.upload;
+    var form = layui.form;
+    /*初始化穿梭框*/
+    var transfer = layui.transfer;
+    //初始化日期控件
+    var laydate = layui.laydate;
+    /*初始化模板引擎*/
+    var laytpl = layui.laytpl;
+    // 执行一个laydate实例
+    laydate.render({  //指定元素
+        elem: '#contractDate'
+    });
+    laydate.render({  //指定元素
+        elem:'#scontractDate'
+    });
+    laydate.render({  //指定元素
+        elem:'#startTime'
+    });
+    laydate.render({  //指定元素
+        elem:'#endTime'
+    });
+    var layerId; //用来保存弹出层的id
+    //渲染表格
+    var tableIndex;
+    $.ajax({
+        url:'[[@{/ps/Pacts}]]',
+        data:{emp_id:$("#dqyg").text()},
+        type:'get',
+        dataType:'json',
+        success:function(result){
+            tableIndex = table.render({
+                elem: '#demo'
+                ,id:'demo'
+                ,height: 400
+                ,data:result.data
+                ,toolbar:'#headBar'
+                ,text:{none:'暂无相关数据'}
+                ,page: true //开启分页
+                ,limit:3
+                ,limits:[3,6,9,12,15,18]
+                ,cols: [
+                    [
+                        {field:'pname', title:'合同全名'}
+                        ,{field:'p_no', title:'合同编号'}
+                        ,{field:'pactmoney', title:'合同金额',hide:true}
+                        ,{field:'returned', title:'回款额',hide:true}
+                        ,{field:'billing', title:'开票额',hide:true}
+                        ,{field:'contractDate', title:'签约日期'}
+                        ,{field:'tbclient', title:'所属客户',
+                        templet:"<div>{{d.tbclient.cname}}</div>"
+                    }
+                        ,{field:'emp', title:'责任人',
+                        templet:"<div>{{d.emp.emp_name}}</div>"
+                    }
+                        ,{field:'state_name', title:'合同状态'}
+                        ,{toolbar: '#barDemo',fixed:'right',title:'操作',align:'center'}
+                    ]
+                ]
+            });
+        }
+
+    });
+
+    //表头的操作
+    table.on('toolbar(demo)',function(obj){
+
+        var checkStatus = table.checkStatus(obj.config.id);
+        var layEvent = obj.event;
+        var rows = checkStatus.data;//获取选中行的数据
+        if(layEvent == "add"){
+            add();
+        }
+    });
+    //每行的操作
+    table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+        var row = obj.data;//获取每行的数据
+        var layEvent =obj.event;//获取事件
+        if(layEvent == "detail"){
+            layIndex = layer.open({
+                type:1
+                ,content:$("#detail")
+                ,shade: false
+                ,shadeClose: true
+                ,area:['1000px','600px']
+                ,success:function(){
+                    $("#dpname").val(row.pname);
+                    $("#dp_no").val(row.p_no);
+                    $("#dpactmoney").val(row.pactmoney);
+                    $("#dreturned").val(row.returned);
+                    $("#dbilling").val(row.billing);
+                    $("#dcontractDate").val(row.contractDate);
+                    $("#dendtDate").val(row.endtDate);
+                    $("#ddept_id").val(row.dept.dept_name);
+                    $("#dc_id").val(row.tbclient.cname);
+                    $("#demp_id").val(row.emp.emp_name);
+                    $("#ddetails").val(row.details);
+                    table.render({
+                        elem: '#approver'
+                        ,id:'approverId'
+                        ,data: row.approverVos //数据接口
+                        ,toolbar:true
+                        ,text:{none:'暂无相关数据'}
+                        ,cols: [
+                            [
+                                {field:'emp_name',title:'审批人'},
+                                {field:'state_name',title:'状态'}
+                            ],
+                        ]
+                    });
+                    $.each(row.approverVos,function(i,v){//循环审批人
+                        if($("#dqyg").text()==v.emp_id){//判断审批人id与当前登录人的id
+                            var statedata = { //获取到当前信息状态  传到模板进行判断
+                                "state_id" : row.state
+                            };
+                            var getTpl = plan_spxz.innerHTML
+                                ,view = document.getElementById('dplan_state');
+                            laytpl(getTpl).render(statedata, function(html){
+                                view.innerHTML = html;
+                            });
+                        }
+                    });
+                    form.render();
+                    form.on('submit(plan_sub)', function(data){
+                        //获取表单区域所有值
+                        var data1 = form.val("pactForm");
+                        var state = data1.formstate;
+                        var p_id = row.p_id;
+                        var pactmoney = row.pactmoney;
+                        var returned = row.returned;
+                        var c_id = row.tbclient.c_id;
+                        var emp_id = row.emp.emp_id;
+                        $.ajax({
+                            url:'[[@{/ps/approve}]]',
+                            data:{
+                                state:state,
+                                pactmoney:pactmoney,
+                                returned:returned,
+                                c_id:c_id,
+                                p_id:p_id,
+                                emp_id:emp_id
+                            },
+                            type:'POST',
+                            dataType:'json',
+                            success:function(res){
+                                window.location.reload();
+                            }
+                        });
+                        return false;
+                    });
+                }
+            });
+        }else if(layEvent == "edit"){
+            if(confirm("确定要搁置这个合同吗？")){
+                var id = row.p_id;
+                update(id);
+            }
+        }else if(layEvent == "aftersale"){
+            var no = row.p_no;
+            addAfter(no);
+        }
+    });
+
+    //作废的异步操作
+    function update(id) {
+        $.ajax({
+            url:'[[@{/ps/doUpdate}]]',
+            data:{_method:'PUT',p_id:id},
+            type:'POST',
+            dataType:'json',
+            success:function(result){
+                if (result.code == "200"){
+                    alert("已处理过！！  不能搁置！");
+                }else {
+                    window.location.reload();
+                }
+            }
+
+        });
+    }
+
+    //加载下拉列表框
+    $.ajax({
+        url:'[[@{/ps/cnames}]]',
+        type:'GET',
+        dateType:'json',
+        success:function(res){
+            var content = "";
+            $.each(res.data[0],function(i,v){
+                content += "<option value='"+v.c_id+"'>"+v.cname+"</option>";
+            });
+            var state = "";
+            $.each(res.data[1],function(i,v){
+                state += "<option value='"+v.id+"'>"+v.state_name+"</option>";
+            });
+            var emp = "";
+            $.each(res.data[2],function(i,v){
+                emp += "<option value='"+v.emp_id+"'>"+v.emp_name+"</option>";
+            });
+            var dept = "";
+            $.each(res.data[3],function(i,v){
+                dept += "<option value='"+v.dept_id+"'>"+v.dept_name+"</option>";
+            });
+            var type = "";
+            $.each(res.data[4],function(i,v){
+                type += "<option value='"+v.typeid+"'>"+v.typename+"</option>";
+            });
+            $("#sstate").append(state);
+            form.render('select','searchFrm');
+            $("#c_id").append(content);
+            $("#emp_id").append(emp);
+            $("#dept_id").append(dept);
+            form.render('select','dataFrm');
+            $("#typeid").append(type);
+            $("#semp_id").append(emp);
+            form.render('select','dataAfterFrm');
+        }
+    });
+
+    //添加时自动生成编号
+    function autoNo() {
+        $.ajax({
+            url:'[[@{/ps/autoNo}]]',
+            type:'GET',
+            dataType:'json',
+            success:function(res){
+                $("#p_no").val(res.data);
+            }});
+    }
+    //添加的操作
+    function add(){
+        layerId = layer.open({
+            type: 1
+            ,title:'添加合同'
+            ,id: 'layerDemo'+Math.random() //防止重复弹出
+            ,content: $('#saveOrUpdateDiv')
+            ,shade: [0.8, '#393D49']
+            ,area:['1000px','600px'],
+            success:function(index){
+                $("#dataFrm")[0].reset();//清空表单数据updemo
+                $("#updemo").remove();
+                autoNo();
+                loademps();
+                //添加执行
+                form.on('submit(formDemo)', function(data){
+                    //获取表单区域所有值
+                    var data1 = form.val("dataFrm");
+                    $.ajax({
+                        url:'[[@{/ps/doAdd}]]',
+                        data:data1,
+                        type:'POST',
+                        dataType:'json',
+                        success:function(res){
+                            console.log("===============")
+                            console.log(res);
+                            if(res.result == 'success'){
+                                addApprover();
+                                layer.msg("添加成功");
+                            }else{
+                                layer.msg("添加失败");
+                            }
+                            layer.close(layerId);
+                            $("#dataFrm")[0].reset();//清空表单数据
+                            window.location.reload();
+                        }
+                    });
+                    return false;
+                });
+            }
+        });
+    }
+    //添加的操作
+    function addAfter(no){
+        $.ajax({
+            url:'[[@{/ps/Pacts}]]',
+            type:'GET',
+            data:{p_no:no},
+            dataType:'json',
+            success:function(res){
+                $("#cId").val(res.data[0].tbclient.c_id);
+                $("#cname").val(res.data[0].tbclient.cname);/*客户*/
+                $("#pNo").val(res.data[0].p_no);/*合同编号*/
+                $("#pId").val(res.data[0].p_id);
+                $("#pName").val(res.data[0].pname);/*合同名称*/
+                $("#state").val(res.data[0].state_name);/*合同状态*/
+                $("#deptId").val(res.data[0].dept.dept_id);
+                $("#deptName").val(res.data[0].dept.dept_name);/*合同所属部门*/
+                $("#scontractDate").val(res.data[0].contractDate);/*签约日期*/
+                form.render('select','dataAfterFrm');
+            }});
+        layerId = layer.open({
+            type: 1
+            ,title:'添加售后服务'
+            ,id: 'layerDemo'+Math.random() //防止重复弹出
+            ,content: $('#saveAfter')
+            ,shade: [0.8, '#393D49']
+            ,area:['1000px','600px'],
+            success:function(index){
+                $("#dataAfterFrm")[0].reset();//清空表单数据updemo
+                $("#updemo").remove();
+                //添加执行
+                form.on('submit(formDemo)', function(data){
+                    //获取表单区域所有值
+                    var data1 = form.val("dataAfterFrm");
+                    $.ajax({
+                        url:'[[@{/ps/doAddAfter}]]',
+                        data:data1,
+                        type:'POST',
+                        dataType:'json',
+                        success:function(res){
+                            console.log("===============")
+                            console.log(res);
+                            if(res.result == 'success'){
+                                layer.msg("添加成功");
+                            }else{
+                                layer.msg("添加失败");
+                            }
+                            layer.close(layerId);
+                            $("#dataAfterFrm")[0].reset();//清空表单数据
+                            window.location.reload();
+                        }
+                    });
+                    return false;
+                });
+            }
+        });
+    }
+    //初始化穿梭框
+    function loademps(){
+        $.ajax({
+            url: '[[@{/ps/Emps}]]',
+            type: 'GET',
+            dateType: 'json',
+            success: function (res) {
+                //显示搜索框
+                transfer.render({
+                    elem: '#action_emp_ids'
+                    ,data: res
+                    ,id:'action_emps'
+                    ,title: ['可选审批人', '已选审批人']
+                    ,showSearch: true
+                    ,width:250 //定义宽度
+                    ,height: 210
+                    ,parseData: function(res){
+                        return {
+                            "value": res.emp_id //数据值
+                            ,"title": res.emp_name //数据标题
+                            ,"disabled": res.disabled  //是否禁用
+                            ,"checked": res.checked //是否选中
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    function addApprover() {
+        var action_emps = new Array();
+        var no = $("#p_no").val();
+        $.each(transfer.getData('action_emps'),function(i,v){
+            action_emps[i]=v.value;
+        });
+        console.log(action_emps);
+        $.ajax({
+            url:'[[@{/ps/addApprover}]]',
+            data:{
+                arr:action_emps,
+                no:no
+            },
+            type:'POST',
+            dataType:'json',
+            traditional: true,
+            success:function(res){
+                console.log("YES")
+            }
+        })
+    }
+
+
+
+    //刷新多条件查询
+    function refresh(){
+        var pname = $("#spname").val();
+        var p_no = $("#sp_no").val();
+        var state = $("#sstate").val();
+        tableIndex.reload(//重载，where后面设置的是传给后台的参数
+            {
+                where:{
+                    pname:pname,
+                    p_no:p_no,
+                    state:state,
+                    emp_id:$("#dqyg").text()
+                }
+                ,page:{
+                    page:1,
+                    limit:3
+                }
+                ,url:'[[@{/ps/Pacts}]]'
+                ,method:'get'
+            });
+    }
+    $("#doSearch").click(function(){
+        refresh();
+    });
+
+
+});
+</script>
+</body>
+</html>

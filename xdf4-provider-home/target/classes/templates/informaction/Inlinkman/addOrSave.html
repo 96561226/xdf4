@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item" style="display: none;" id="fid">
+            <label class="layui-form-label">联系人编号</label>
+            <div class="layui-input-block">
+                <input id="id" type="text" name="id" required   readonly placeholder="联系人编号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-upload">
+            <label class="layui-form-label">上传头像</label>
+            <input type="hidden" name="pic" id="pic"/>
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="test1">上传图片</button>
+                <div class="layui-upload-list" style="padding-left: 120px;">
+                    <img class="layui-upload-img" id="demo1" style="width:50px;height:50px;border-radius: 25px; text-align: center;">
+                    <p id="demoText"></p>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-block">
+                <select name="emp_id" lay-filter="emp_id" id="emp_id" disabled>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">个性签名</label>
+            <div class="layui-input-block">
+                <input type="text" id="signature" name="signature" required  lay-verify="required" placeholder="请输入个性签名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属机构</label>
+            <div class="layui-input-block">
+                <select name="dept_id" lay-filter="dept_id" id="dept_id" disabled>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">固定电话</label>
+            <div class="layui-input-block">
+                <input type="text" id="gphone" name="gphone" required  lay-verify="required" placeholder="请输入固定电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">移动电话</label>
+            <div class="layui-input-block">
+                <input type="text" id="yphone" name="yphone" required  lay-verify="required" placeholder="请输入移动电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电子邮箱</label>
+            <div class="layui-input-block">
+                <input type="text" id="email" name="email" required  lay-verify="required" placeholder="请输入电子邮箱" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">紧急联系人</label>
+            <div class="layui-input-block">
+                <input type="text" id="urgent" name="urgent" required  lay-verify="required" placeholder="请输入紧急联系人号码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">即时通信</label>
+            <div class="layui-input-block">
+                <input type="text" id="im" name="im" required  lay-verify="required" placeholder="请输入即时通信" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

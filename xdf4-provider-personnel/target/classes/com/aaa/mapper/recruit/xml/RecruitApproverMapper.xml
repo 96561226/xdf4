@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.recruit.RecruitApproverMapper">
+    <resultMap id="tbRecruitApproverVoMap" type="com.aaa.pojo.personnel.TbRecruitApproverVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="recruit_id" jdbcType="INTEGER" property="recruitId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+    <select id="selectRecruitApprovers" parameterType="Integer" resultMap="tbRecruitApproverVoMap">
+        select approver.*,te.emp_name,tas.state_name from tb_recruit_approver approver
+        left join tb_emp te
+        on approver.emp_id = te.emp_id
+        left join tb_recruit tr
+        on approver.recruit_id = tr.recruit_id
+        left join tb_approver_state tas
+        on approver.state = tas.state_id
+        where tr.recruit_id = #{id}
+    </select>
+    <insert id="insertRecruitApprover" parameterType="com.aaa.pojo.personnel.TbRecruitApprover">
+        insert into tb_recruit_approver(
+            recruit_id,emp_id,remark)
+        values(#{recruitId},#{empId},#{remark});
+    </insert>
+
+    <update id="updateState" parameterType="com.aaa.pojo.personnel.TbRecruitApprover">
+        update tb_recruit_approver
+        set state = 2
+        where recruit_id = #{recruitId}
+        and emp_id = #{empId}
+    </update>
+</mapper>

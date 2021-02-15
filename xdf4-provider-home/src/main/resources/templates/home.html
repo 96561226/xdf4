@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8" >
+    <title>系统首页</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-bg-cyan layui-layout-admin">
+    <div class="layui-header layui-bg-cyan">
+        <div class="layui-logo layui-bg-cyan">XDF4OA管理系统</div>
+        <ul class="layui-nav layui-layout-left  layui-ygyd-menu" style="position:absolute; left:250px;">
+            <li class="layui-nav-item">您拥有的角色：</li>
+            <li class="layui-nav-item"><span sec:authentication="principal.authorities[2]"></span></li>
+
+        </ul>
+        <ul class="layui-nav layui-bg-cyan layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    欢迎您，[[${username}]] 工号：[[${emp_no}]]
+                </a>
+            </li>
+            <li class="layui-nav-item"><a th:href="@{/logout}">退出</a></li>
+        </ul>
+    </div>
+    <div class="layui-side layui-bg-cyan layui-bg-black">
+        <div class="layui-side-scroll layui-bg-cyan">
+
+
+            <ul class="layui-nav layui-nav-tree layui-bg-cyan"  lay-shrink="all"  lay-filter="test">
+                <li class="layui-nav-item " th:each="menu:${menus}">
+                    <a href="javascript:;" th:text="${menu.menu_name}">一级菜单</a>
+
+                    <dl class="layui-nav-child" th:each="menuson:${menu.children}">
+
+                        <dd>
+                            <a href="javascript:;" class="funinfo" th:url="${menuson.menu_url}" th:text="${menuson.menu_name}">二级菜单</a>
+
+                            <dl class="layui-nav-child" th:each="menusonson:${menuson.children}">
+                                <dd>
+                                    <a href="javascript:;" class="funinfo" th:url="${menusonson.menu_url}" th:text="${menusonson.menu_name}">三级菜单</a>
+                                </dd>
+                            </dl>
+
+                        </dd>
+
+                    </dl>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+
+        <iframe id="main" th:src="@{index.html}" style="width:100%;height:99%;border:none;margin: 5px 0px 0px 5px">
+
+        </iframe>
+    </div>
+
+</div>
+
+
+
+<script th:inline="javascript">
+
+    var ctx = [[${#httpServletRequest.getContextPath()}]];
+
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+    $(".funinfo").click(function () {
+        var url=$(this).attr("url");
+        console.log(ctx+url);
+        $("#main").attr("src",ctx+url);
+    })
+</script>
+</body>
+
+</html>

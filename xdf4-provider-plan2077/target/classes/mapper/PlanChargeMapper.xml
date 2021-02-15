@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PlanChargeMapper">
+<!--    <resultMap id="BaseResultMap" type="com.aaa.pojo.plans.TbPlanCharge">
+        <result column="plan_cid" jdbcType="INTEGER" property="plan_cid" />
+        <result column="pid" jdbcType="INTEGER" property="pid" />
+        <result column="charge_emp_id" jdbcType="INTEGER" property="charge_emp_id" />
+    </resultMap>
+
+    <select id="selPlanChargeByPlanId" resultMap="BaseResultMap">
+        select tpc.*,e.emp_name,tas.state_name from tb_plan_charge tpc
+        inner join tb_emp e on tpc.pid=#{plan_id} and e.emp_id = tpc.charge_emp_id
+        inner join tb_approver_state tas on tpc.state = tas.state_id
+    </select>-->
+
+    <update id="updPlanCharge">
+        update tb_plan_charge set state=#{state} where charge_emp_id = #{charge_emp_id} and pid = #{pid}
+    </update>
+
+    <insert id="insertPlanCharge" parameterType="com.aaa.pojo.plans.TbPlanCharge">
+        insert into tb_plan_charge (pid, charge_emp_id) values (#{pid},#{charge_emp_id})
+    </insert>
+
+    <delete id="delPlanCharge">
+        delete from tb_plan_charge where plan_cid=plan_cid
+    </delete>
+
+</mapper>

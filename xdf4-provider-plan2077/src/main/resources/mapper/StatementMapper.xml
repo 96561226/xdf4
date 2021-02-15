@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.StatementMapper">
+    <resultMap id="statementVo" type="com.aaa.pojo.plans.StatementVo">
+        <id column="statement_id" jdbcType="INTEGER" property="statement_id" />
+        <result column="statement_no" jdbcType="VARCHAR" property="statement_no" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="parent_id" jdbcType="INTEGER" property="parent_id" />
+        <result column="pname" jdbcType="VARCHAR" property="pname" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+        <result column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        <result column="emp_name" jdbcType="VARCHAR" property="emp_name" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="type_name" jdbcType="INTEGER" property="type_name" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="state_name" />
+        <collection property="statementCharges" ofType="com.aaa.pojo.plans.TbStatementCharge">
+            <id column="statement_cid" jdbcType="INTEGER" property="statement_cid" />
+            <result column="statement_id" jdbcType="INTEGER" property="sid" />
+            <result column="cemp_id" jdbcType="INTEGER" property="charge_emp_id" />
+            <result column="cname" jdbcType="VARCHAR" property="emp_name" />
+            <result column="cstate" jdbcType="VARCHAR" property="state_name" />
+        </collection>
+        <collection property="statementSchedulings" ofType="com.aaa.pojo.plans.TbStatementScheduling" column="statement_id" select="com.aaa.springcloud.mapper.StatementSchedulingMapper.selStatementSchedulingByStatementId">
+            <id column="statement_sid" jdbcType="INTEGER" property="statement_sid" />
+        </collection>
+    </resultMap>
+
+    <insert id="insertStatement" parameterType="com.aaa.pojo.plans.TbStatement">
+        insert into tb_statement (statement_no, title, dept_id, emp_id, parent_id, cdate, type)
+         values (#{statement_no},#{title},#{dept_id},#{emp_id},#{parent_id},#{cdate},#{type})
+    </insert>
+
+    <delete id="delStatement">
+        delete tb_statement where statement_id=#{statement_id}
+    </delete>
+
+    <update id="updStatement" parameterType="com.aaa.pojo.plans.TbStatement">
+        update tb_statement
+        <set>
+            <if test=" statement_no!=null and statement_no!=''">  statement_no=#{statement_no}, </if>
+            <if test=" title!=null and title!=''"> title =#{title}, </if>
+            <if test=" dept_id!=null "> dept_id =#{dept_id}, </if>
+            <if test=" emp_id!=null "> emp_id =#{emp_id}, </if>
+            <if test=" parent_id!=null "> parent_id =#{parent_id}, </if>
+            <if test=" cdate!=null "> cdate =#{cdate}, </if>
+            <if test=" type!=null "> type=#{type}, </if>
+            <if test=" state!=null "> state =#{state} </if>
+        </set>
+        where statement_id=#{statement_id}
+    </update>
+
+    <select id="selStatementAll" parameterType="com.aaa.searchpojo.SearchStatement" resultMap="statementVo">
+        select ts.*,tp.title pname,te.emp_name,td.dept_name,tss.state_name,tpt.name type_name
+        ,techarge.emp_name cname,techarge.emp_id cemp_id,tas.state_name cstate
+        ,tsc.statement_cid
+        from tb_statement ts
+        left join tb_statement tp on  ts.parent_id = tp.statement_id
+        inner join tb_emp te on ts.emp_id = te.emp_id
+        inner join tb_dept td on ts.dept_id = td.dept_id
+        inner join tb_statement_state tss on ts.state = tss.state_id
+        inner join tb_plan_type tpt on ts.type = tpt.plan_tid
+
+        left join tb_statement_charge tsc on ts.statement_id = tsc.sid
+        left join tb_emp techarge on techarge.emp_id = tsc.charge_emp_id
+        left join tb_approver_state tas on tsc.state = tas.state_id
+
+
+        <trim prefix="where" prefixOverrides="and">
+
+            <if test="charge_emp_id!=null"> and tsc.charge_emp_id = #{charge_emp_id} </if>
+
+            <if test="statement_id!=null"> and ts.statement_id=#{statement_id} </if>
+            <if test="statement_no!=null and statement_no!=''"> and ts.statement_no=#{statement_no} </if>
+            <if test="title!=null and title!=''"> and ts.title like #{title} </if>
+            <if test="dept_id!=null"> and ts.dept_id=#{dept_id} </if>
+            <if test="emp_id!=null"> and ts.emp_id=#{emp_id} </if>
+            <if test="parent_id!=null"> and ts.parent_id=#{parent_id} </if>
+            <if test="parent_no!=null and parent_no!=''"> and tp.statement_no=#{parent_no} </if>
+            <if test="sdate!=null"> and ts.cdate>#{sdate} </if>
+            <if test="edate!=null"> <![CDATA[ and ts.cdate<#{edate} ]]></if>
+            <if test="type!=null"> and ts.type=#{type} </if>
+            <if test="state!=null"> and ts.state=#{state} </if>
+        </trim>
+        order by statement_no desc
+    </select>
+
+    <select id="selStatementTypes" resultType="com.aaa.pojo.plans.TbStatementType">
+        select * from tb_statement_type
+    </select>
+
+</mapper>

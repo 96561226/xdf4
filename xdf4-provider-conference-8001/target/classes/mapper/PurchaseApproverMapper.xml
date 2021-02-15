@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PurchaseApproverMapper">
+    <resultMap id="purchaseApproverVoMap" type="com.aaa.pojo.conference.PurchaseApproverVo">
+        <result column="id" jdbcType="BIGINT" property="id" />
+        <result column="purchase_id" jdbcType="BIGINT" property="purchaseId" />
+        <result column="did" jdbcType="BIGINT" property="empId" />
+        <result column="dno" jdbcType="VARCHAR" property="empNo" />
+        <result column="dname" jdbcType="VARCHAR" property="empName" />
+        <result column="dremark" jdbcType="VARCHAR" property="remark" />
+        <result column="dstate" jdbcType="INTEGER" property="state" />
+    </resultMap>
+    <select id="selPurchaseApproverAll" resultMap="purchaseApproverVoMap">
+        SELECT pa.id,pa.purchase_id,pa.emp_id did,pa.remark dremark,pa.state dstate,emp.emp_no dno,emp.emp_name dname
+        FROM tb_purchase_approver pa,tb_emp emp
+        WHERE pa.emp_id=emp.emp_id and pa.purchase_id=#{purchase_id}
+    </select>
+    <update id="updPurchaseApprover" parameterType="com.aaa.pojo.conference.TbPurchaseApprover">
+        UPDATE	tb_purchase_approver SET state=#{state},remark=#{remark} WHERE purchase_id=#{purchaseId} AND emp_id=#{empId}
+    </update>
+    <insert id="addPurchaseApprover" parameterType="com.aaa.pojo.conference.TbPurchaseApprover">
+        INSERT INTO tb_purchase_approver(purchase_id,emp_id,remark,state) VALUES(#{purchaseId},#{empId},#{remark},#{state});
+    </insert>
+</mapper>    

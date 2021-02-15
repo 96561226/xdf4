@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PlanSchedulingMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.plans.TbPlanScheduling">
+        <id column="plan_sid" jdbcType="INTEGER" property="plan_sid" />
+        <result column="pid" jdbcType="INTEGER" property="pid" />
+        <result column="scheduling" jdbcType="VARCHAR" property="scheduling" />
+        <result column="adate" jdbcType="DATE" property="adate" />
+    </resultMap>
+
+    <select id="selPlanSchedulingByPlanId" resultMap="BaseResultMap">
+        select * from tb_plan_scheduling where pid=#{plan_id}
+    </select>
+
+    <insert id="insertPlanScheduling" parameterType="com.aaa.pojo.plans.TbPlanScheduling">
+        insert into tb_plan_scheduling (pid, scheduling, adate) values (#{pid},#{scheduling},#{adate})
+    </insert>
+
+    <delete id="delPlanScheduling">
+        delete from tb_plan_scheduling where plan_sid=#{plan_sid}
+    </delete>
+
+    <update id="updPlanScheduling" parameterType="com.aaa.pojo.plans.TbPlanScheduling">
+        update tb_plan_scheduling
+        <set>
+            <if test="pid !=null"> pid = #{pid} </if>
+            <if test="scheduling !=null and !=''"> scheduling = #{scheduling} </if>
+            <if test="adate !=null">adate = #{adate} </if>
+        </set>
+        where plan_sid=#{plan_sid}
+    </update>
+</mapper>

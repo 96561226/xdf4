@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加弹出层-->
+<div style="display: none;padding: 20px;" id="purchseSQ" th:fragment="purchse_SQ">
+    <id class="layui-form-item"><h3>物品采购申请</h3>
+        <h5 style="color:red;">*注意申请人默认为当前登陆人</h5>
+        <h5 style="color:red;">*审批人尽量不要超过3个</h5>
+        <h5 style="color:red;">*采购物品默认储存在中央仓库</h5>
+    </id>
+    <form class="layui-form"  id="purchseFrm" lay-filter="purchseFrm" type="post">
+        <div class="layui-form-item">
+            <div class="layui-inline"><label class="layui-form-label">采购便号:</label></div>
+            <div class="layui-inline">
+                <input type="text" id="purchaseNo" name="purchaseNo" lay-verify="title" autocomplete="off" class="layui-input" disabled>
+            </div>
+            <div class="layui-inline"><label class="layui-form-label">申请时间:</label></div>
+            <div class="layui-inline">
+                <input type="text" id="purchaseCreateTime" name="purchaseCreateTime" lay-verify="title" class="layui-input" placeholder="yyyy-MM-dd HH:mm:ss" disabled>
+            </div>
+            <div class="layui-inline">
+                <input type="text" id="empId" name="empId" lay-verify="title" autocomplete="off" class="layui-input" disabled style="display: none">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline"><label class="layui-form-label">物品名称:</label></div>
+            <div class="layui-inline">
+                <input type="text" id="purchaseName" name="purchaseName" lay-verify="title" autocomplete="off" class="layui-input" >
+            </div>
+            <div class="layui-inline"><label class="layui-form-label">资产供应商:</label></div>
+            <div class="layui-inline">
+                <input type="text" id="purchaseManufacturer" name="purchaseManufacturer" lay-verify="title" autocomplete="off" class="layui-input" >
+            </div>
+        </div>
+        <div class="layui-form-item" >
+            <div class="layui-inline"> <label class="layui-form-label">物品类型:</label></div>
+            <div class="layui-inline">
+                <select id="typeId" name="typeId" lay-filter="aihao" lay-verify="title">
+                    <option value=""></option>
+                </select>
+            </div>
+            <div class="layui-inline"> <label class="layui-form-label">可否借用:</label></div>
+            <div class="layui-inline">
+                <select id="purchaseState" name="purchaseState" lay-filter="aihao" lay-verify="title">
+                    <option value=""></option>
+                    <option value="1">可借用</option>
+                    <option value="2">不可借用</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline"><label class="layui-form-label">资产价值:</label></div>
+            <div class="layui-inline">
+                <input type="number" id="purchaseUnivalence" name="purchaseUnivalence" lay-verify="title" autocomplete="off" class="layui-input" >
+            </div>
+            <div class="layui-inline"><label class="layui-form-label">存放地点:</label></div>
+            <div class="layui-inline">
+                <input type="text" value="中央仓库" id="purchasePlace" name="purchasePlace" lay-verify="title" autocomplete="off" class="layui-input" >
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批人</label>
+            <div id="action_emp_ids" name="action_emp_ids" class="demo-transfer"  lay-verify="csk"></div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="remark" name="remark" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="purchseDemo" id="bt1">立即提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--修改的弹出层-->
+<div style="display: none;padding: 20px;" id="purchseSP" th:fragment="purchse_SP">
+    <id class="layui-form-item">
+        <h3>物品审批表</h3>
+
+    </id>
+    <form class="layui-form" id="purchseSPFrm" lay-filter="purchseSPFrm" type="post">
+        <h3>申请资料</h3>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">采购id：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchaseId" name="sppurchaseId" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">采购编号：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchaseNo" name="sppurchaseNo" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产名称：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchaseName" name="sppurchaseName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产供应商：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchaseManufacturer" name="sppurchaseManufacturer" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">资产价值：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchaseUnivalence" name="sppurchaseUnivalence" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">可否借用id：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchaseState" name="sppurchaseState" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">可否借用：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchaseStateName" name="sppurchaseStateName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">暂存地点：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppurchasePlace" name="sppurchasePlace" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">申请人id：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spempId" name="spempId" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请人：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spempName" name="spempName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="spremark" name="spremark" class="layui-textarea"disabled></textarea>
+            </div>
+        </div>
+        <h3>审批区</h3>
+        <div class="layui-form-item">
+            <label class="layui-form-label">请输入您的意见：</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="myremark" name="myremark" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="forOK" id="bt2">同意</button>
+                <button class="layui-btn" lay-submit lay-filter="forNO" id="bt3">退回</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

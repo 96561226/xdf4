@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item" style="display: none;" id="fid">
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-block">
+                <input id="c_id" type="text" name="c_id"  required   readonly placeholder="编号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">客户名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="cname" name="cname" required  lay-verify="required" placeholder="请输入客户名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">预计成交金额</label>
+            <div class="layui-input-block">
+                <input type="text" id="predict" name="predict" required  lay-verify="required" placeholder="请输入预计成交金额" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <fieldset class="layui-elem-field">
+            <legend>不可改动！！</legend><br/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">合同数</label>
+                <div class="layui-input-block">
+                    <input type="text" readonly id="p_count" name="p_count" required  lay-verify="required" placeholder="请输入合同数" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">合同金额</label>
+                <div class="layui-input-block">
+                    <input type="text" readonly id="pactmoney" name="pactmoney" required  lay-verify="required" placeholder="请输入合同金额" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">回款数</label>
+                <div class="layui-input-block">
+                    <input type="text" readonly id="returned" name="returned" required  lay-verify="required" placeholder="请输入回款数" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">售后服务数</label>
+                <div class="layui-input-block">
+                    <input type="text" readonly id="s_count" name="s_count" required  lay-verify="required" placeholder="请输入售后服务数" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </fieldset>
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属类型</label>
+            <div class="layui-input-block">
+                <select name="type_id" lay-filter="type_id" id="type_id">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

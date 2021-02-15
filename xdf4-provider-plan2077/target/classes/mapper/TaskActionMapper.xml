@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.TaskActionMapper">
+
+    <insert id="insertTaskAction" parameterType="com.aaa.pojo.plans.TbTaskAction">
+        insert into tb_task_action (task_id, action_emp_id) values (#{task_id},#{action_emp_id})
+    </insert>
+
+    <delete id="delTaskAction">
+        delete from tb_task_action where task_aid=#{task_aid}
+    </delete>
+
+    <update id="updTaskAction" parameterType="com.aaa.pojo.plans.TbTaskAction">
+        update tb_task_action
+        <set>
+            <if test=" task_id!=null"> task_id=#{task_id},  </if>
+            <if test=" action_emp_id!=null">  action_emp_id=#{action_emp_id} </if>
+        </set>
+        where task_aid=#{task_aid}
+    </update>
+
+<!--    <select id="selTaskActionByTaskId" resultType="com.aaa.pojo.plans.TbTaskAction">
+        select * from tb_task_action where task_id=#{task_id}
+    </select>-->
+
+</mapper>

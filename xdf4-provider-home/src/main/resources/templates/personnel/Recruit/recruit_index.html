@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示招聘信息</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+<div th:replace="personnel/Recruit/recruit_search::search"></div>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+<!--防止图片一半显示-->
+<style rel="stylesheet">
+    .layui-table-cell{
+        text-align:center;
+        height: auto;
+        white-space: normal;
+    }
+    .layui-table img{
+        max-width:100%;
+    }
+    .layui-table-cell .layui-form-checkbox [lay-skin="primary"]{
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+<!--当前员工id-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<!--表头的操作-->
+<script type="text/html" id="headBar">
+    <a class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-circle" style="color:red;"></i>去申请</a>
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="delAll"><i class="layui-icon layui-icon-delete" style="color:yellow;"></i>批量作废</a>
+</script>
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="detail">详情</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">作废</a>
+</script>
+<!--添加和详情的弹出层-->
+<div th:replace="personnel/Recruit/Recruit_add::addOrUpdate"></div>
+<div th:replace="personnel/Recruit/Recruit_detail::detail_common"></div>
+<script type="text/html" id="plan_spxz">
+
+    {{#  if(d.state_id === 1){ }}
+    <div class="layui-form-item">
+        <label class="layui-form-label">审批选择</label>
+        <div class="layui-input-block">
+            <input class="radio" type="radio" lay-filter="formstate" name="formstate" value="2" />通过
+            <br><input class="radio" type="radio" lay-filter="formstate" name="formstate" value="3" th:text="退回" />
+            <br><input class="radio" type="radio" lay-filter="formstate" name="formstate" value="4" th:text="作废" />
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="plan_sub" >审批确认</button>
+        </div>
+    </div>
+    {{#  } }}
+
+    {{#  if(d.state_id === 2){ }}
+    <div class="layui-form-item">
+        <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+        <div class="layui-input-block">
+            <input type="hidden" name="formstate" value="5" text="归档"/>
+            <button class="layui-btn" lay-submit lay-filter="plan_sub">确认归档</button>
+        </div>
+    </div>
+    {{#  } }}
+
+</script>
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','laytpl','transfer','form','laydate'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var laytpl = layui.laytpl;
+        var form = layui.form;
+        //初始化日期控件
+        var laydate = layui.laydate;
+        //穿梭框
+        var transfer = layui.transfer;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#arrivalDate' //指定元素
+            ,min: 1
+        });
+
+        var layerId; //用来保存弹出层的id
+        //渲染表格
+        var tableIndex = table.render({
+            elem: '#demo'
+            ,id:'demo'
+            ,height: 500
+            ,url: '[[@{/recruit/all}]]' //数据接口
+            ,toolbar:'#headBar'
+            ,text:{none:'暂无相关数据'}
+            ,page: true //开启分页
+            ,limit:5
+            ,limits:[5,10,15,20,25,30,35,40]
+            ,cols: [
+                [
+                    {type:'checkbox'}
+                    ,{field:'recruitNo', title:'编号'}
+                    ,{field:'empName', title:'员工'}
+                    ,{field:'theme', title:'主题'}
+                    ,{field:'roleName', title:'招聘岗位'}
+                    ,{field:'number', title:'招聘人数'}
+                    ,{field:'applyDate', title:'发布日期'}
+                    ,{field:'stateName', title:'状态'}
+                    ,{toolbar: '#barDemo',fixed:'right',title:'操作',align:'center'}
+                ]
+            ]
+
+        })
+        //每行的操作
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "detail"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#detail")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['800px','600px']
+                    ,success:function(){
+                        $("#drecruitId").val(row.recruitId);
+                        $("#drecruitNo").val(row.recruitNo);
+                        $("#dtheme").val(row.theme);
+                        $("#dempName").val(row.empName);
+                        $("#droleName").val(row.roleName);
+                        $("#dnumber").val(row.number);
+                        $("#darrivalDate").val(row.arrivalDate);
+                        $("#dcause").val(row.cause);
+                        $("#dcontent").val(row.content);
+                        $("#dforeignRequire").val(row.foreignRequire);
+                        $("#dminAge").val(row.minAge);
+                        $("#dmaxAge").val(row.maxAge);
+                        $("#dsex").val(row.sex);
+                        $("#deducation").val(row.education);
+                        $("#dmajor").val(row.major);
+                        $("#dsite").val(row.site);
+                        $("#dexperience").val(row.experience);
+                        $("#dapplyDate").val(row.applyDate);
+                        $("#dendDate").val(row.endDate);
+                        $("#dstateName").val(row.stateName);
+                        var tableApprover = table.render({
+                            elem: '#approver'
+                            ,id:'approver'
+                            ,data: row.recruitApprovers //数据接口
+                            ,toolbar:true
+                            ,text:{none:'暂无相关数据'}
+                            ,cols: [
+                                [
+                                    {field:'empName',title:'审批人'},
+                                    {field:'stateName',title:'状态'}
+                                ],
+                            ]
+                        });
+                        var tableNotify = table.render({
+                            elem: '#notify'
+                            ,id:'notify'
+                            ,data: row.recruitNotifies //数据接口
+                            ,toolbar:true
+                            ,text:{none:'暂无相关数据'}
+                            ,cols: [
+                                [
+                                    {field:'empName',title:'知会人'}
+                                ],
+                            ]
+                        });
+                        $.each(row.recruitApprovers,function(i,v){//循环审批人
+                            if(v.empId==$("#dqyg").text()){//判断审批人id与当前登录人的id
+                                var statedata = { //获取到当前信息状态  传到模板进行判断
+                                    "state_id" : row.state
+                                };
+                                var getTpl = plan_spxz.innerHTML
+                                    ,view = document.getElementById('dplan_state');
+                                laytpl(getTpl).render(statedata, function(html){
+                                    view.innerHTML = html;
+                                });
+                            }
+                        });
+                        form.render();
+                        form.on('submit(plan_sub)', function(data){
+                            //获取表单区域所有值
+                            var data1 = form.val("recruitForm");
+                            var state = data1.formstate;
+                            var recruitId = row.recruitId;
+                            var empId = row.empId;
+                            console.log(empId);
+                            $.ajax({
+                                url:'[[@{/recruit/approve}]]',
+                                data:{
+                                    state:state,
+                                    recruitId:recruitId,
+                                    empId:empId
+                                },
+                                type:'POST',
+                                dataType:'json',
+                                success:function(res){
+                                    window.location.reload();
+                                }
+                            });
+                            return false;
+                        });
+                    }
+                });
+
+            }else if(layEvent == "del"){
+                if(confirm("确定要作废这个申请吗？")){
+                    if (row.empId == $("#dqyg").text()){
+                        var id = row.recruitId;
+                        cancallation(id);
+                    }else {
+                        layer.msg("您没有该权限！");
+                    }
+                }
+
+            }
+        });
+
+        //表头的操作
+        table.on('toolbar(demo)',function(obj){
+
+            var checkStatus = table.checkStatus(obj.config.id);
+            var layEvent = obj.event;
+            var rows = checkStatus.data;//获取选中行的数据
+            if(layEvent == "add"){
+                add();
+            }else if(layEvent == "delAll"){
+                if(rows.length == 0){
+                    layer.alert('必须选中行才可以作废！');
+                    return;
+                }
+                if(confirm("确定要作废这个申请吗")){
+                    var ids = new Array();
+                    $.each(rows,function(i,d){
+                        if (d.empId == $("#dqyg").text()){
+                            ids[i] = d.recruitId;
+                        }else {
+                            ids = null;
+                            layer.msg("有不属于您的申请！");
+                            return;
+                        }
+                    });
+                    if (ids != null) {
+                        cancallationAll(ids);
+                    }
+                }
+            }
+        });
+
+        //作废的异步操作
+        function cancallation(id) {
+            $.ajax({
+                url:'[[@{/recruit/cancellation}]]',
+                data:{id:id},
+                type:'POST',
+                dataType:'json',
+                success:function(result){
+                    if (result.code == "400"){
+                        alert("已处理过！！  不能作废！");
+                    }else {
+                        window.location.reload();
+                    }
+                }
+
+            });
+        }
+        //批量作废的异步操作
+        function cancallationAll(ids){
+            $.ajax({
+                url:'[[@{/recruit/cancellations}]]',
+                data:{ids:ids},
+                type:'POST',
+                dataType:'json',
+                success:function(result){
+                    if (result.code == "400"){
+                        alert("已处理过！！  不能作废！");
+                    }else {
+                        window.location.reload();
+                    }
+                }
+
+            });
+        }
+
+        //加载下拉列表框
+        //路径改为 查询类型的单查询
+        $.ajax({
+            url:'[[@{/recruit/empRoleAndState}]]',
+            async: false,
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var emp = "";
+                var role = "";
+                var states = "";
+                $.each(res.data[0],function(i,v){
+                    emp += "<option value='"+v.emp_id+"'>"+v.emp_name+"</option>";
+                });
+                $.each(res.data[1].data,function(i,v){
+                    states += "<option value='"+v.state_id+"'>"+v.fstate_name+"</option>";
+                });
+                $.each(res.data[2].data,function(i,v){
+                    role += "<option value='"+v.role_id+"'>"+v.role_name+"</option>";
+                });
+                $("#sempId").append(emp);
+                $("#sroleId").append(role);
+                $("#sstate").append(states);
+                $("#empId").append(emp);
+                $("#roleId").append(role);
+                form.render('select','dataFrm');
+                form.render('select','searchFrm');
+            }
+        });
+
+        //刷新多条件查询
+        function refresh(){
+            var recruitNo = $("#srecruitNo").val();
+            var empId = $("#sempId").val();
+            var roleId = $("#sroleId").val();
+            var state = $("#sstate").val();
+            tableIndex.reload(//重载，where后面设置的是传给后台的参数
+                {
+                    where:{
+                        recruitNo:recruitNo,
+                        empId:empId,
+                        roleId:roleId,
+                        state:state
+                    }
+                    ,page:{
+                        page:1,
+                        limit:5
+                    }
+                    ,url:'[[@{/recruit/all}]]'
+                    ,method:'get'
+                });
+        }
+        $("#doSearch").click(function(){
+            refresh();
+        });
+
+        //添加的操作
+        function add(){
+            layerId = layer.open({
+                type: 1
+                ,title:'招聘人才申请'
+                ,id: 'layerDemo'+Math.random() //防止重复弹出
+                ,content: $('#saveOrUpdateDiv')
+                ,shade: [0.8, '#393D49']
+                ,area:['1200px','700px'],
+                success:function(){
+                    $("#dataFrm")[0].reset();//清空表单数据updemo
+                    $("#updemo").remove();
+                    autoNo();
+                    loademps();
+                    //添加执行
+                    form.on('submit(formDemo)', function(data){
+                        //获取表单区域所有值
+                        var data1 = form.val("dataFrm");
+                        $.ajax({
+                            url:'[[@{/recruit/add}]]',
+                            data:data1,
+                            type:'POST',
+                            dataType:'json',
+                            success:function(res){
+                                addApprover();
+                            }
+                        });
+                        return false;
+                    });
+                }
+            });
+        }
+        //添加时自动生成编号
+        function autoNo() {
+            $.ajax({
+                url:'[[@{/recruit/autoNo}]]',
+                type:'GET',
+                dataType:'json',
+                success:function(res){
+                    $("#recruitNo").val(res.data);
+                }});
+        }
+
+        function addApprover() {
+            var charge_emps = new Array();
+            var no = $("#recruitNo").val();
+            $.each(transfer.getData('charge_emps'),function(i,v){
+                charge_emps[i]=v.value;
+            });
+            console.log(charge_emps);
+            $.ajax({
+                url:'[[@{/recruit/addApprover}]]',
+                data:{
+                    arr:charge_emps,
+                    no:no
+                },
+                type:'POST',
+                dataType:'json',
+                traditional: true,
+                success:function(res){
+                    layer.msg("添加成功");
+                    layer.close(layerId);
+                    $("#dataFrm")[0].reset();//清空表单数据
+                    window.location.reload();
+                }
+            })
+        }
+
+        //初始化穿梭框
+        function loademps(){
+            var id = new Array();
+            $.ajax({
+                url: '[[@{/recruit/selectSeaEmp}]]',
+                type: 'GET',
+                dateType: 'json',
+                success: function (res) {
+                   $.each(res,function (i,v) {
+                       if (res[i].role_name == "master" || res[i].role_name == "人事经理"){
+                          id.push(res[i].emp_id);
+                       }
+                   });
+                    //显示搜索框
+                    transfer.render({
+                        elem: '#charge_emp_ids'
+                        ,data: res
+                        ,id:'charge_emps'
+                        ,title: ['可选员工', '已选员工']
+                        ,showSearch: true
+                        ,width:250 //定义宽度
+                        ,height: 210
+                        ,value:id
+                        ,parseData: function(res){
+                            if(res.role_name == "master" || res.role_name == "人事经理"){
+                                return {
+                                    "value": res.emp_id //数据值
+                                    ,"title": res.emp_name+" "+res.dept_name+" "+res.role_name //数据标题
+                                    ,"disabled": true  //是否禁用
+                                    ,"checked": res.checked //是否选中
+                                }
+                            }else{
+                                return {
+                                    "value": res.emp_id //数据值
+                                    ,"title": res.emp_name+" "+res.dept_name+" "+res.role_name //数据标题
+                                    ,"disabled": res.disabled  //是否禁用
+                                    ,"checked": res.checked //是否选中
+                                }
+                            }
+                        }
+                    })
+                }
+            })
+        }
+
+        $("#maxAge").blur(function(){
+            let max = Number($("#maxAge").val());
+            let min = Number($("#minAge").val());
+            if (max<min){
+                $("#maxAge").val("");
+                $("#minAge").val("");
+            }
+
+        });
+
+    });
+</script>
+</body>
+</html>

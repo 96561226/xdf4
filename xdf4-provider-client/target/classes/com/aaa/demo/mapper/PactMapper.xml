@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.demo.mapper.PactMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.client.TbPactVo">
+        <id column="p_id" jdbcType="INTEGER" property="p_id" />
+        <association column="c_id" javaType="com.aaa.pojo.client.Tbclient" property="tbclient">
+            <id column="c_id" jdbcType="INTEGER" property="c_id" />
+        </association>
+        <association column="emp_id" javaType="com.aaa.pojo.Emp" property="emp">
+            <id column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        </association>
+        <association column="dept_id" javaType="com.aaa.pojo.Dept" property="dept">
+            <id column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        </association>
+        <collection property="approverVos" ofType="com.aaa.pojo.client.TbPactApproverVo"
+                    column="p_id" select="com.aaa.demo.mapper.ApproverMapper.selApprover">
+            <id column="id" jdbcType="INTEGER" property="id" ></id>
+        </collection>
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aaa.pojo.client.SearchPact">
+        SELECT p.*,c.cname,e.emp_name,d.dept_name,s.state_name FROM tb_pact p
+        LEFT JOIN tb_client c
+        ON p.c_id=c.c_id
+        LEFT JOIN tb_emp e
+        ON p.emp_id=e.emp_id
+        LEFT JOIN tb_dept d
+        ON p.dept_id=d.dept_id
+        LEFT JOIN tb_pact_state s
+        ON p.state=s.id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="pname != null and pname!=''">
+                and p.pname like "%"#{pname}"%"
+            </if>
+            <if test="p_no != null and p_no!=''">
+                and p.p_no like "%"#{p_no}"%"
+            </if>
+            <if test="state != null">
+                and p.state =#{state}
+            </if>
+            <if test="emp_id != null">
+                and p.emp_id =#{emp_id}
+            </if>
+        </trim>
+        order by p.p_id desc
+    </select>
+
+    <select id="findByID" parameterType="int" resultType="com.aaa.pojo.client.TbPact">
+        select * from tb_pact where p_id = #{p_id}
+    </select>
+
+    <insert id="insert" parameterType="com.aaa.pojo.client.TbPact">
+        insert into tb_pact (pname,p_no,pactmoney,returned,billing,contractDate,endtDate,c_id,emp_id,dept_id,details)
+        values (#{pname}, #{p_no},#{pactmoney},
+        #{returned}, #{billing},#{contractDate},#{endtDate},#{c_id},#{emp_id},#{dept_id},#{details})
+    </insert>
+
+
+    <update id="update" parameterType="integer">
+        update tb_pact set state = 3
+        where p_id = #{p_id}
+    </update>
+
+    <select id="selState" resultType="com.aaa.pojo.client.TbPactState">
+        select * from Tb_pact_state
+    </select>
+
+    <select id="selNo" resultType="java.lang.String">
+        select CONCAT("HT",(select right(1000000+(select max(p_id)+1 from tb_pact),6)))
+    </select>
+
+    <insert id="insertPactApprover" parameterType="com.aaa.pojo.client.TbPactApprover">
+        insert into tb_pact_approver(p_id,emp_id) values(#{p_id},#{emp_id})
+    </insert>
+    <update id="addPactCount" parameterType="com.aaa.pojo.client.TbPact">
+        update tb_client set
+        p_count = p_count+1,
+        pactmoney = pactmoney+#{pactmoney},
+        returned = returned +#{returned}
+        where c_id = #{c_id}
+    </update>
+    <update id="addAfterCount" parameterType="com.aaa.pojo.client.TbafterSale">
+        update tb_client set
+        s_count = s_count+1
+        where c_id = #{c_id}
+    </update>
+
+    <!--追加售后服务-->
+    <insert id="insertAfter" parameterType="com.aaa.pojo.client.TbafterSale">
+        insert into tb_afterSale (theme,ojname,gphone,yphone,email,startTime,endTime,content,
+        feedback,typeid,emp_id,c_id,dept_id,p_id)
+        values (#{theme}, #{ojname},#{gphone},
+        #{yphone}, #{email},#{startTime},#{endTime},
+        #{content},#{feedback},#{typeid},
+        #{emp_id},#{c_id},#{dept_id},#{p_id})
+    </insert>
+
+    <update id="updatePactState" parameterType="com.aaa.pojo.client.TbPact">
+        update tb_pact set state=#{state}
+        where p_id=#{p_id}
+    </update>
+
+</mapper>

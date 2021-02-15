@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item" style="display: none;" id="fid">
+            <label class="layui-form-label">文档编号</label>
+            <div class="layui-input-block">
+                <input id="id" type="text" name="id" required   readonly placeholder="联系人编号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="dname" name="dname" required  lay-verify="required" placeholder="请输入文档名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">版本号</label>
+            <div class="layui-input-block">
+                <input type="text" id="versions" name="versions"  lay-verify="required" placeholder="请输入文档的版本号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">作者</label>
+            <div class="layui-input-block">
+                <input type="text" id="author" name="author" required  lay-verify="required" placeholder="请输入作者" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档类型</label>
+            <div class="layui-input-block">
+                <select name="type_id" lay-filter="type_id" id="type_id">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">关键字</label>
+            <div class="layui-input-block">
+                <input type="text" id="keyword" name="keyword"  lay-verify="required" placeholder="请输入关键字" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属部门</label>
+            <div class="layui-input-block">
+                <select name="dept_id" lay-filter="dept_id" id="dept_id">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档相关信息</label>
+            <div class="layui-input-block">
+                <input type="text" id="accessory" name="accessory"  lay-verify="required" placeholder="请输入文档相关信息" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">更新时间</label>
+            <div class="layui-input-block">
+                <input id="updatetime" name="updatetime"  lay-verify="required" placeholder="请输入更新时间" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-upload">
+            <label class="layui-form-label">上传文件</label>
+            <input type="hidden" name="filename" id="filename"/>
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="test1"><i class="layui-icon"></i>上传文件</button>
+                <div class="layui-upload-list" style="padding-left: 120px;">
+                    <input type="file" class="layui-upload-file" id="demo1" >
+                    <p id="demoText"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

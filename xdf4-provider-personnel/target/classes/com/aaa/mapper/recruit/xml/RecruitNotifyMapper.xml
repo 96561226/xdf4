@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.recruit.RecruitNotifyMapper">
+    <resultMap id="tbRecruitNotifyVoMap" type="com.aaa.pojo.personnel.TbRecruitNotifyVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="recruit_id" jdbcType="INTEGER" property="recruitId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    </resultMap>
+    <select id="selectRecruitNotifys" parameterType="Integer" resultMap="tbRecruitNotifyVoMap">
+        select notify.*,te.emp_name,tns.state_name from tb_recruit_notify notify
+        left join tb_emp te
+        on notify.emp_id = te.emp_id
+        left join tb_recruit tr
+        on notify.recruit_id = tr.recruit_id
+        left  join tb_notify_state tns
+        on notify.state = tns.state_id
+        where tr.recruit_id = #{id}
+    </select>
+    <insert id="insertRecruitNotify" parameterType="com.aaa.pojo.personnel.TbRecruitNotify">
+        insert into tb_recruit_notify(
+        recruit_id,emp_id)
+        values(#{recruitId},#{empId})
+    </insert>
+</mapper>

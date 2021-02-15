@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.travelling.TravellingNotifyMapper">
+    <resultMap id="tbTravellingNotifyMap" type="com.aaa.pojo.finance.TbTravellingNotifyVo">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="travelling_id" jdbcType="INTEGER" property="travellingId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="INTEGER" property="empName" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    </resultMap>
+    <select id="selectTravellingNotify" parameterType="Integer" resultMap="tbTravellingNotifyMap">
+        select notify.*,emp.emp_name,tns.state_name from tb_travelling_notify notify
+        left join tb_emp emp
+        on notify.emp_id = emp.emp_id
+        left join tb_notify_state tns
+        on notify.state = tns.state_id
+        where travelling_id = #{travellingId}
+    </select>
+    <insert id="insertTravellingNotify" parameterType="com.aaa.pojo.finance.TbTravellingNotify">
+        insert into tb_travelling_notify(travelling_id, emp_id)
+        values(#{travellingId},#{empId})
+    </insert>
+    <resultMap id="TravellingNotifyMap" type="com.aaa.pojo.finance.TbTravellingNotify">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="travelling_id" jdbcType="INTEGER" property="travellingId" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+    </resultMap>
+    <select id="selectTravellingNotifyById" resultMap="TravellingNotifyMap" parameterType="Integer">
+        select * from tb_travelling_notify where travelling_id = #{travellingId}
+    </select>
+</mapper>

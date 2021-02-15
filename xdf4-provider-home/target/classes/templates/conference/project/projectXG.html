@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登记项目</title>
+</head>
+<body>
+<!--添加弹出层-->
+<div style="display: none;padding: 20px;" id="projectXG" th:fragment="project_XG">
+    <id class="layui-form-item">
+        <h3>进度修改</h3>
+        <h5 style="color:red;">*1.修改后的金额不能小于修改前的</h5>
+        <h5 style="color:red;">*2.项目完成必须添加完成时间</h5>
+    </id>
+    <form class="layui-form"  id="xgFrm" lay-filter="xgFrm" type="post">
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">id</label>
+            <div class="layui-input-block">
+                <input type="text" id="xgid" name="xgid" lay-verify="title" autocomplete="off"  class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">投资总额</label>
+            <div class="layui-input-block">
+                <input type="text" id="xgprojectPredictMoney" name="xgprojectPredictMoney" lay-verify="title" autocomplete="off"  class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">原本已用金额</label>
+            <div class="layui-input-block">
+                <input type="number" id="ybprojectUseMoney" name="ybprojectUseMoney"  autocomplete="off"  class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">已用金额</label>
+            <div class="layui-input-block">
+                <input type="number" value="0" id="xgprojectUseMoney" name="xgprojectUseMoney" lay-verify="je" autocomplete="off"  class="layui-input" >
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">项目开始时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="xglayui-input" id="xgprojectBeginTime" name="xgprojectBeginTime"  placeholder="yyyy-MM-dd" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">项目结束时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="xglayui-input" id="xgprojectEndTime" name="xgprojectEndTime" lay-verify="xgend" placeholder="yyyy-MM-dd">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">项目状态</label>
+            <div class="layui-input-block">
+                <select id="xgprojectState" name="xgprojectState" lay-filter="aihao" lay-verify="xz">
+                    <option value="1">实施中</option>
+                    <option value="2">已完成</option>
+                    <option value="3">已废弃</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="XgDemo" id="bt1">立即提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

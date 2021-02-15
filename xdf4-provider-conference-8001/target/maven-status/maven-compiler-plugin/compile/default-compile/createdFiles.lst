@@ -1,0 +1,17 @@
+com\aaa\springcloud\mapper\ConferenceroomPropertyMapper.class
+com\aaa\springcloud\service\PropertyServiceImpl.class
+com\aaa\springcloud\mapper\PropertyMapper.class
+com\aaa\springcloud\mapper\ConferenceroomMapper.class
+com\aaa\springcloud\service\WZService.class
+com\aaa\springcloud\config\BaseController$1.class
+com\aaa\springcloud\config\BaseController.class
+com\aaa\springcloud\config\BeansConfig.class
+com\aaa\springcloud\ConferenceMain8001.class
+com\aaa\springcloud\mapper\ConferenceroomApproverMapper.class
+com\aaa\springcloud\mapper\ConferenceroomApplyMapper.class
+com\aaa\springcloud\controller\ConferenceroomController.class
+com\aaa\springcloud\service\ConferenceroomService.class
+com\aaa\springcloud\ResultMapGenerator.class
+com\aaa\springcloud\service\PropertyService.class
+com\aaa\springcloud\controller\PropertyController.class
+com\aaa\springcloud\service\ConferenceroomServiceImpl.class

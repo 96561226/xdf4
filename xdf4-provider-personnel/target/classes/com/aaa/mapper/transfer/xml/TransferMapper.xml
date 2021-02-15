@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.transfer.TransferMapper">
+    <resultMap id="tbTransferVoMap" type="com.aaa.pojo.personnel.TbTransferVo">
+        <result column="transfer_id" jdbcType="INTEGER" property="transferId" />
+        <result column="transfer_no" jdbcType="VARCHAR" property="transferNo" />
+        <result column="theme" jdbcType="VARCHAR" property="theme" />
+        <result column="emp_id" jdbcType="INTEGER" property="empId" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="dept_id" jdbcType="INTEGER" property="deptId" />
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+        <result column="role_id" jdbcType="INTEGER" property="roleId" />
+        <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+        <result column="new_dept_id" jdbcType="INTEGER" property="newDeptId" />
+        <result column="new_dept_name" jdbcType="VARCHAR" property="newDeptName" />
+        <result column="new_role_id" jdbcType="INTEGER" property="newRoleId" />
+        <result column="new_role_name" jdbcType="VARCHAR" property="newRoleName" />
+        <result column="cause" jdbcType="VARCHAR" property="cause" />
+        <result column="type_id" jdbcType="INTEGER" property="typeId" />
+        <result column="type" jdbcType="VARCHAR" property="typeName" />
+        <result column="opinion" jdbcType="VARCHAR" property="opinion" />
+        <result column="new_opinion" jdbcType="VARCHAR" property="newOpinion" />
+        <result column="apply_date" jdbcType="DATE" property="applyDate" />
+        <result column="end_date" jdbcType="DATE" property="endDate" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="fstate_name" jdbcType="VARCHAR" property="stateName" />
+        <collection property="transferNotifyVos" ofType="com.aaa.pojo.personnel.TbTransferNotifyVo"
+                    column="transfer_id" select="com.aaa.mapper.transfer.TransferNotifyMapper.selectTransferNotifys">
+            <id column="id" jdbcType="INTEGER" property="id"></id>
+        </collection>
+        <collection property="transferApproverVos" ofType="com.aaa.pojo.personnel.TbTransferApproverVo"
+                    column="transfer_id" select="com.aaa.mapper.transfer.TransferApproverMapper.selectTransferApprovers">
+            <id column="id" jdbcType="INTEGER" property="id" ></id>
+        </collection>
+    </resultMap>
+<!--  添加  -->
+    <insert id="addTransfer" parameterType="com.aaa.pojo.personnel.TbEntry">
+        insert into tb_transfer(
+            transfer_no, theme, emp_id,
+            dept_id, role_id,
+            new_dept_id, new_role_id,
+            cause, type_id, opinion,
+            new_opinion, apply_date
+        )values(
+            #{transferNo},#{theme},#{empId},#{deptId},
+            #{roleId},#{newDeptId},#{newRoleId},#{cause},
+            #{typeId},#{opinion},#{newOpinion},curdate()
+        )
+    </insert>
+<!--  修改表信息  -->
+    <update id="updateTransfer" parameterType="com.aaa.pojo.personnel.TbTransfer">
+        update tb_transfer set end_date = curdate(),state = #{state} where transfer_id = #{transferId}
+    </update>
+    <select id="selNo" parameterType="java.lang.String" resultType="java.lang.String">
+        select CONCAT(#{noName},(select right(1000000+(select max(transfer_id)+1 from tb_transfer),6)))
+    </select>
+<!--  条件查询  -->
+    <select id="selectTransfer" parameterType="com.aaa.pojo.personnel.SearchEntry" resultMap="tbTransferVoMap">
+        select
+            transfer.*,emp.emp_name,dept.dept_name,role.role_name,dept1.dept_name new_dept_name,
+            role1.role_name new_role_name,tfs.fstate_name,type.type
+         from tb_transfer transfer
+        left join tb_transfer_type type
+        on transfer.type_id = type.id
+        left join tb_emp emp
+        on transfer.emp_id = emp.emp_id
+        left join tb_dept dept
+        on transfer.dept_id = dept.dept_id
+        left join tb_roles role
+        on transfer.role_id = role.role_id
+        left join tb_dept dept1
+        on transfer.new_dept_id = dept1.dept_id
+        left join tb_roles role1
+        on transfer.new_role_id = role1.role_id
+        left join tb_form_state tfs
+        on transfer.state = tfs.state_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="transferId != null">
+                and transfer.transfer_Id = #{transferId}
+            </if>
+            <if test="transferNo != null">
+                and transfer.transfer_no like "%"#{transferNo}"%"
+            </if>
+            <if test="empId != null">
+                and transfer.emp_id = #{empId}
+            </if>
+            <if test="deptId != null">
+                and transfer.dept_id = #{deptId}
+            </if>
+            <if test="roleId != null">
+                and transfer.role_id = #{roleId}
+            </if>
+            <if test="newDeptId != null">
+                and transfer.new_dept_id = #{newDeptId}
+            </if>
+            <if test="newRoleId != null">
+                and transfer.new_role_id = #{newRoleId}
+            </if>
+            <if test="state != null">
+                and transfer.state = #{state}
+            </if>
+        </trim>
+        order by transfer.transfer_id desc
+    </select>
+
+    <!--查询全部离职类型-->
+    <select id="selectTypeAll" resultType="com.aaa.pojo.personnel.TbTransferType">
+        select * from tb_transfer_type
+    </select>
+    <resultMap id="eV" type="com.aaa.pojo.EmpVo">
+        <id column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        <result column="emp_no" jdbcType="VARCHAR" property="emp_no" />
+        <result column="emp_name" jdbcType="VARCHAR" property="emp_name" />
+        <result column="role_id" jdbcType="INTEGER" property="role_id" />
+        <result column="role_name" jdbcType="VARCHAR" property="role_name" />
+        <result column="mgr" jdbcType="INTEGER" property="mgr" />
+        <result column="mgr_name" jdbcType="VARCHAR" property="mgr_name" />
+        <result column="hiredate" jdbcType="DATE" property="hiredate" />
+        <result column="sal" jdbcType="DOUBLE" property="sal" />
+        <result column="comm" jdbcType="DOUBLE" property="comm" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+    </resultMap>
+    <select id="selectEmpById" parameterType="Integer" resultMap="eV">
+        select te.*,td.dept_name,te2.emp_name mgr_name,tr.role_name
+         from tb_emp te
+         left join tb_dept td on te.dept_id = td.dept_id
+         left join tb_emp te2 on te.mgr = te2.emp_id
+         left join tb_roles tr on te.role_id = tr.role_id
+         where te.emp_id = #{id}
+    </select>
+
+    <select id="selectByState" parameterType="com.aaa.pojo.personnel.TbTransfer" resultType="com.aaa.pojo.personnel.TbTransfer">
+        select * from tb_transfer
+        where emp_id = #{empId}
+        and state = 1
+    </select>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="xdf4-api-dao" />
+        <module name="xdf4-api-commons" />
+        <module name="cloud-eureka-server7001" />
+        <module name="cloud-eureka-server7002" />
+        <module name="xdf4-provider-information" />
+        <module name="xdf4-provider-home" />
+        <module name="xdf4-provider-conference-8001" />
+        <module name="xdf4-provider-plan2077" />
+        <module name="xdf4-provider-personnel" />
+        <module name="xdf4-provider-finance" />
+        <module name="xdf4-provider-client" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cloud-eureka-server7001" target="1.8" />
+      <module name="cloud-eureka-server7002" target="1.8" />
+      <module name="xdf4" target="1.8" />
+      <module name="xdf4-api-commons" target="1.8" />
+      <module name="xdf4-api-dao" target="1.8" />
+      <module name="xdf4-provider-client" target="1.8" />
+      <module name="xdf4-provider-conference-8001" target="1.8" />
+      <module name="xdf4-provider-finance" target="1.8" />
+      <module name="xdf4-provider-home" target="1.8" />
+      <module name="xdf4-provider-information" target="1.8" />
+      <module name="xdf4-provider-personnel" target="1.8" />
+      <module name="xdf4-provider-plan2077" target="1.8" />
+      <module name="xdf4-provider-systemmaster" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

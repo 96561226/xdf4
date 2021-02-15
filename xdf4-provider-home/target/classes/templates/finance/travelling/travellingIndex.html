@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示差旅费报销表信息</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--当前员工id-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<!--条件筛选-->
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>查询条件</legend>
+</fieldset>
+<div th:replace="finance/travelling/Travelling_search::search"></div>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+<!--防止图片一半显示-->
+<style rel="stylesheet">
+    .layui-table-cell{
+        text-align:center;
+        height: auto;
+        white-space: normal;
+    }
+    .layui-table img{
+        max-width:100%;
+    }
+    .layui-table-cell .layui-form-checkbox [lay-skin="primary"]{
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+
+<!--表头的操作-->
+<script type="text/html" id="headBar">
+    <a class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-circle" style="color:red;"></i>去申请</a>
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="delAll"><i class="layui-icon layui-icon-delete" style="color:yellow;"></i>批量作废</a>
+</script>
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="detail">详情</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">作废</a>
+</script>
+<!--添加和修改的弹出层-->
+<div th:replace="finance/travelling/travellingAdd::addOrUpdate"></div>
+<div th:replace="finance/travelling/travellingDetail::detail_common"></div>
+<script type="text/html" id="plan_spxz">
+
+    {{#  if(d.state_id === 1){ }}
+    <div class="layui-form-item">
+        <label class="layui-form-label">审批选择</label>
+        <div class="layui-input-block">
+            <input class="radio" type="radio" lay-filter="formstate" name="formstate" value="2" />通过
+            <br><input class="radio" type="radio" lay-filter="formstate" name="formstate" value="3" th:text="退回" />
+            <br><input class="radio" type="radio" lay-filter="formstate" name="formstate" value="4" th:text="作废" />
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="plan_sub" >审批确认</button>
+        </div>
+    </div>
+    {{#  } }}
+
+    {{#  if(d.state_id === 2){ }}
+    <div class="layui-form-item">
+        <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+        <div class="layui-input-block">
+            <input type="hidden" name="formstate" value="5" text="归档"/>
+            <button class="layui-btn" lay-submit lay-filter="plan_sub">确认归档</button>
+        </div>
+    </div>
+    {{#  } }}
+
+</script>
+<script type="text/javascript">
+layui.use(['table','jquery','layer','upload','laytpl','transfer','form','laydate'],function(){
+    var $ = layui.jquery;
+    var table = layui.table;
+    var layer = layui.layer;
+    var upload = layui.upload;
+    var form = layui.form;
+    //初始化日期控件
+    var laydate = layui.laydate;
+    //模板引擎
+    var laytpl = layui.laytpl;
+    //穿梭框
+    var transfer = layui.transfer;
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#applyDate' //指定元素
+        ,min: 1
+        ,max: 2
+    });
+
+    var layerId; //用来保存弹出层的id
+    //渲染表格
+    var tableIndex = table.render({
+        elem: '#demo'
+        ,id:'demo'
+        ,height: 500
+        ,url: '[[@{/travelling/all}]]' //数据接口
+        ,toolbar:'#headBar'
+        ,text:{none:'暂无相关数据'}
+        ,page: true //开启分页
+        ,limit:5
+        ,limits:[5,10,15,20,25,30,35,40]
+        ,cols: [
+            [
+            {type:'checkbox'}
+            ,{field:'travellingNo', title:'编号'}
+            ,{field:'empName', title:'员工'}
+            ,{field:'deptName', title:'部门'}
+            ,{field:'applyDate', title:'日期'}
+            ,{field:'cause', title:'事由'}
+            ,{
+                field:'approverName'
+                , title:'审批人'
+                ,templet:
+                    function(d){
+                        var rolestr = "";
+                        var ary = d.approverName;
+                        ary.forEach(function(item,index){
+                            rolestr += item.empName+"<br/>";
+                        });
+                        return rolestr;
+                    }
+            }
+            ,{field:'stateName', title:'状态'}
+            ,{toolbar: '#barDemo',fixed:'right',title:'操作',align:'center'}
+        ]
+        ]
+
+    });
+
+    //表头的操作
+    table.on('toolbar(demo)',function(obj){
+
+        var checkStatus = table.checkStatus(obj.config.id);
+        var layEvent = obj.event;
+        var rows = checkStatus.data;//获取选中行的数据
+        if(layEvent == "add"){
+            add();
+        }else if(layEvent == "delAll"){
+            if(rows.length == 0){
+                layer.alert('必须选中行才可以作废！');
+                return;
+            }
+            if(confirm("确定要作废这个申请吗")){
+              var ids = new Array();
+              $.each(rows,function(i,d){
+                  if (d.empId == $("#dqyg").text()){
+                    ids[i] = d.travellingId;
+                  }else {
+                      ids = null;
+                      layer.msg("有不属于您的申请！");
+                      return;
+                  }
+              });
+            if (ids != null){
+                delAll(ids);
+            }
+            }
+        }
+
+    });
+    //每行的操作
+    table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+
+        var row = obj.data;//获取每行的数据
+        var layEvent =obj.event;//获取事件
+        if(layEvent == "detail"){
+            layIndex = layer.open({
+                type:1
+                ,content:$("#detail")
+                ,shade: [0.8, '#393D49']
+                ,area:['1000px','600px']
+                ,success:function(){
+                    $("#dtravellingId").val(row.travellingId);
+                    $("#dtravellingNo").val(row.travellingNo);
+                    $("#dempName").val(row.empName);
+                    $("#ddeptName").val(row.deptName);
+                    $("#dapplyDate").val(row.applyDate);
+                    $("#dcause").val(row.cause);
+                    $("#dstateName").val(row.stateName);
+                    $("#dremark").val(row.remark);
+                    table.render({
+                        elem: '#content'
+                        ,id:'contentId'
+                        ,data: row.travellingContents //数据接口
+                        ,toolbar:true
+                        ,text:{none:'暂无相关数据'}
+                        ,totalRow:true
+                        ,cols: [
+                            [
+                                {field:'startStopTime',title:'起止时间' , totalRowText: '合计'},
+                                {field:'startStopAddress',title:'起止地点'},
+                                {field:'description',title:'描述'},
+                                {field:'tramp',title:'长途交通费', sort: true, totalRow: true},
+                                {field:'city',title:'市内交通费', sort: true, totalRow: true},
+                                {field:'stay',title:'住宿费', sort: true, totalRow: true},
+                                {field:'evection',title:'出差补贴', sort: true, totalRow: true},
+                                {field:'others',title:'其他费用', sort: true, totalRow: true}
+                            ],
+                        ]
+                    });
+                    table.render({
+                        elem: '#approver'
+                        ,id:'approverId'
+                        ,data: row.approverName //数据接口
+                        ,toolbar:true
+                        ,text:{none:'暂无相关数据'}
+                        ,cols: [
+                            [
+                                {field:'empName',title:'审批人'},
+                                {field:'stateName',title:'状态'}
+                            ],
+                        ]
+                    });
+                    table.render({
+                        elem: '#notify'
+                        ,id:'notifyId'
+                        ,data: row.travellingNotifies //数据接口
+                        ,toolbar:true
+                        ,text:{none:'暂无相关数据'}
+                        ,cols: [
+                            [
+                                {field:'empName',title:'知会人'}
+                            ],
+                        ]
+                    });
+                    $.each(row.approverName,function(i,v){//循环审批人
+                        if(v.empId==$("#dqyg").text()){//判断审批人id与当前登录人的id
+                            var statedata = { //获取到当前信息状态  传到模板进行判断
+                                "state_id" : row.state
+                            };
+                            var getTpl = plan_spxz.innerHTML
+                                ,view = document.getElementById('dplan_state');
+                            laytpl(getTpl).render(statedata, function(html){
+                                view.innerHTML = html;
+                            });
+                        }
+                    });
+                    form.render();
+                    form.on('submit(plan_sub)', function(data){
+                        //获取表单区域所有值
+                        var data1 = form.val("travellingForm");
+                        var state = data1.formstate;
+                        var travellingId = row.travellingId;
+                        $.ajax({
+                            url:'[[@{/travelling/approve}]]',
+                            data:{
+                                state:state,
+                                travellingId:travellingId
+                            },
+                            type:'POST',
+                            dataType:'json',
+                            success:function(res){
+                                window.location.reload();
+                            }
+                        });
+                        return false;
+                    });
+                }
+            });
+        }else if(layEvent == "del"){
+            if(confirm("确定要作废这个申请吗？")){
+                if (row.empId == $("#dqyg").text()){
+                    var id = row.travellingId;
+                    del(id);
+                }else {
+                    layer.msg("您没有该权限！");
+                }
+            }
+
+        }
+    });
+    //作废的异步操作
+    function del(id) {
+        $.ajax({
+            url:'[[@{/travelling/cancellation}]]',
+            data:{id:id},
+            type:'POST',
+            dataType:'json',
+            success:function(result){
+                if (result.code == "400"){
+                    alert("已处理过！！  不能作废！");
+                }else {
+                    window.location.reload();
+                }
+            }
+        });
+    }
+    //批量作废的异步操作
+    function delAll(ids){
+        $.ajax({
+            url:'[[@{/travelling/cancellations}]]',
+            data:{ids:ids},
+            type:'POST',
+            dataType:'json',
+            success:function(result){
+                window.location.reload();
+            },error:function () {
+                alert("已处理过！！  不能作废！");
+            }
+
+        });
+    }
+    //加载下拉列表框
+    //路径改为 查询类型的单查询
+     $.ajax({
+         url:'[[@{/travelling/empAndDept}]]',
+         async: false,
+         type:'GET',
+         dateType:'json',
+         success:function(res){
+             var emp = "";
+             var dept = "";
+             var state = "";
+             $.each(res.data[0],function(i,v){
+                 emp += "<option value='"+v.emp_id+"'>"+v.emp_name+"</option>";
+             });
+             $.each(res.data[1].data,function(i,v){
+                 dept += "<option value='"+v.dept_id+"'>"+v.dept_name+"</option>";
+             });
+             $.each(res.data[2].data,function(i,v){
+                 state += "<option value='"+v.state_id+"'>"+v.fstate_name+"</option>";
+             });
+             $("#sempId").append(emp);
+             $("#sdeptId").append(dept);
+             $("#sstate").append(state);
+             $("#empId").append(emp);
+             $("#deptId").append(dept);
+             form.render('select','dataFrm');
+             form.render('select','searchFrm');
+         }
+     });
+
+    //添加的操作
+    function add(){
+        layerId = layer.open({
+            type: 1
+            ,title:'报销申请'
+            ,id: 'layerDemo'+Math.random() //防止重复弹出
+            ,content: $('#saveOrUpdateDiv')
+            ,shade: [0.8, '#393D49']
+            ,area:['1200px','700px'],
+            success:function(index){
+                $("#dataFrm")[0].reset();//清空表单数据updemo
+                $("#updemo").remove();
+                autoNo();
+                loademps();
+                //添加执行
+                form.on('submit(formDemo)', function(data){
+                    //获取表单区域所有值
+                    var data1 = form.val("dataFrm");
+                    $.ajax({
+                        url:'[[@{/travelling/add}]]',
+                        data:data1,
+                        type:'POST',
+                        dataType:'json',
+                        success:function(res){
+                            addContent();
+                            addApprover();
+                            if(res.code == '200'){
+                                layer.msg("添加成功");
+                            }else{
+                                layer.msg("添加失败");
+                            }
+                            layer.close(layerId);
+                            $("#dataFrm")[0].reset();//清空表单数据
+                            window.location.reload();
+                        }
+                    });
+                    return false;
+                });
+            }
+        });
+    }
+    //添加时自动生成编号
+    function autoNo() {
+        $.ajax({
+            url:'[[@{/travelling/autoNo}]]',
+            type:'GET',
+            dataType:'json',
+            success:function(res){
+                $("#travellingNo").val(res.data);
+            }});
+    }
+    //添加详情
+    function addContent() {
+        var num = $("#tab").find("tr").length;
+        var no = $("#tab").find("tr").eq(0).find("#travellingNo").val();
+        for (var i = 3; i < num; i++) {
+            var data = [];
+            data.push(no);
+            var input = $("#tab").find("tr").eq(i).find(".xxx");
+            for (var i = 0; i < input.length; i++) {
+                data.push(input.eq(i).val());
+            }
+            $.ajax({
+                url:'[[@{/travelling/addContent}]]',
+                type:'Post',
+                data:{
+                    'arr':data
+                },
+                traditional: true,//这里设置为true
+                dataType:'json',
+                success:function(res){
+                    if (res.data == 0){
+                        layer.msg("添加失败");
+                    }
+                }});
+            }
+        }
+
+    //刷新多条件查询
+    function refresh(){
+        var travellingNo = $("#stravellingNo").val();
+        var empId = $("#sempId").val();
+        var deptId = $("#sdeptId").val();
+        var state = $("#sstate").val();
+        tableIndex.reload(//重载，where后面设置的是传给后台的参数
+            {
+                where:{
+                    travellingNo:travellingNo,
+                    empId:empId,
+                    deptId:deptId,
+                    state:state
+                }
+                ,page:{
+                    page:1,
+                    limit:5
+                }
+                ,url:'[[@{/travelling/all}]]'
+                ,method:'get'
+            });
+    }
+    $("#doSearch").click(function(){
+        refresh();
+    });
+    /*添加表格的一行*/
+    $(document).on('click','#add',function () {
+        var tr = "<tr>" +
+            "<td><input type=\"text\" name='startStopTime' class=\"layui-input xxx\"></td>" +
+            "<td><input type=\"text\" name='startStopAddress' class=\"layui-input xxx\"></td>" +
+            "<td><input type=\"text\" name='description' class=\"layui-input xxx\"></td>" +
+            "<td><input type=\"text\" name='tramp' class=\"layui-input xxx\"></td>" +
+            "<td><input type=\"text\" name='city' class=\"layui-input xxx\"></td>" +
+            "<td><input type=\"text\" name='stay' class=\"layui-input xxx\"></td>" +
+            "<td><input type=\"text\" name='evection' class=\"layui-input xxx\"></td>" +
+            "<td><input type=\"text\" name='others' class=\"layui-input xxx\"></td>" +
+            "<td> <button type=\"button\" class=\"layui-btn layui-btn-sm del\" >\n" +
+            "     <i class=\"layui-icon\">&#xe640;</i>\n" +
+            "</button></td>" +
+            "</tr>";
+        $("#tab").append(tr);
+    });
+    $(document).on('click','.del',function(){
+        $(this).parent().parent().remove();
+
+    });
+    function addApprover() {
+        var charge_emps = new Array();
+        var no = $("#travellingNo").val();
+        $.each(transfer.getData('charge_emps'),function(i,v){
+            charge_emps[i]=v.value;
+        });
+        $.ajax({
+            url:'[[@{/travelling/addApprover}]]',
+            data:{
+                arr:charge_emps,
+                no:no
+            },
+            type:'POST',
+            dataType:'json',
+            traditional: true,
+            success:function(res){
+                console.log("YES")
+            }
+        })
+    }
+
+    //初始化穿梭框
+    function loademps(){
+        var id = new Array();
+        $.ajax({
+            url: '[[@{/travelling/selectSeaEmp}]]',
+            type: 'GET',
+            dateType: 'json',
+            success: function (res) {
+                $.each(res,function (i,v) {
+                    if (res[i].role_name == "master" || res[i].role_name == "财务经理"){
+                        id.push(res[i].emp_id);
+                    }
+                });
+                //显示搜索框
+                transfer.render({
+                    elem: '#charge_emp_ids'
+                    ,data: res
+                    ,id:'charge_emps'
+                    ,title: ['可选员工', '已选员工']
+                    ,showSearch: true
+                    ,width:250 //定义宽度
+                    ,height: 210
+                    ,value:id
+                    ,parseData: function(res){
+                        if(res.role_name == "master" || res.role_name == "财务经理"){
+                            return {
+                                "value": res.emp_id //数据值
+                                ,"title": res.emp_name+" "+res.dept_name+" "+res.role_name //数据标题
+                                ,"disabled": true  //是否禁用
+                                ,"checked": res.checked //是否选中
+                            }
+                        }else{
+                            return {
+                                "value": res.emp_id //数据值
+                                ,"title": res.emp_name+" "+res.dept_name+" "+res.role_name //数据标题
+                                ,"disabled": res.disabled  //是否禁用
+                                ,"checked": res.checked //是否选中
+                            }
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+});
+
+</script>
+</body>
+</html>

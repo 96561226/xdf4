@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>显示所有的角色</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<!--员工编号-->
+<span style="display: none" readonly id="dqyg" sec:authentication="principal.authorities[0]"/>
+<table lay-even class="layui-table" id="demo" lay-filter="demo"></table>
+
+<!--每行的操作-->
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-warm layui-btn-xs " lay-event="update">编辑资源权限</a>
+</script>
+
+<!--添加和修改的弹出层-->
+<div th:replace="systemmaster/roletransaction/roletransaction_update::addOrUpdate"></div>
+<script type="text/javascript">
+    layui.use(['table','jquery','layer','upload','form','laydate','laytpl','transfer'],function(){
+        var $ = layui.jquery;
+        var table = layui.table;
+        var planDetail = layui.table;
+        var layer = layui.layer;
+        var upload = layui.upload;
+        var form = layui.form;
+        var transfer = layui.transfer;
+
+        var laytpl = layui.laytpl;
+
+        //初始化日期控件
+        var laydate = layui.laydate;
+
+        var layerId; //用来保存弹出层的id
+
+        //渲染表格
+        var tableIndex;
+        $.ajax({
+            url:'[[@{/rs/selectRVAll}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                tableIndex = table.render({
+                    elem: '#demo'
+                    ,id:'demo'
+                    ,height: 800
+                    ,toolbar:true
+                    ,data:res.data
+                    ,text:{none:'暂无相关数据'}
+                    ,page: true //开启分页
+                    ,page:{
+                        limit:10
+                        ,limits:[8,10,25,30]
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                        ,count:res.count
+                    }
+                    ,cols: [
+                        [
+                            // {type:'checkbox'},
+                            {field:'role_id', title:'岗位角色ID',hide:true}
+                            ,{field:'role_name', title:'岗位名称'}
+                            ,{field:'role_des', title:'岗位简述'}
+                            ,{field:'state', title:'岗位状态'
+                            , templet:
+                                function(d){
+                                    if (d.role_state==1){
+                                        return '<span class="layui-badge layui-bg-blue">正常</span>'
+                                    }
+                                    return '<span class="layui-badge">禁用</span>';
+                                }
+                            }
+                            ,{field:'transactions', title:'访问资源'
+                            , templet:
+                                function(d){
+                                    var transactions = "";
+                                    var ary = d.transactions;
+                                    ary.forEach(function (item,index) {
+                                        transactions += item.menu_name+","
+                                    })
+                                    return transactions;
+                                }
+                            }
+                            ,{toolbar: '#barDemo',title:'操作',align:'center'}
+                        ]
+                    ]
+                });
+            }
+        });
+
+        table.on('tool(demo)',function(obj){//tool是工具条事件，demo是table的lay-filter对应的值
+
+            var row = obj.data;//获取每行的数据
+            var layEvent =obj.event;//获取事件
+            if(layEvent == "update"){
+                layIndex = layer.open({
+                    type:1
+                    ,content:$("#saveOrUpdateDiv")
+                    ,shade: [0.8, '#393D49']
+                    ,area:['900px','600px']
+                    ,success:function(){
+                        $("#dataFrm")[0].reset();//清空表单数据
+                        //设置最初的值
+                        //给表单赋值
+                        loademps(row.role_id);
+                        form.val("dataFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                            "role_id": row.role_id // "name": "value"
+                            ,"role_name": row.role_name
+                        });
+                        form.on('submit(formDemo)', function(data){
+                            //获取表单区域所有值
+                            var data1 = form.val("dataFrm");
+                            var tids = new Array();
+                            $.each(transfer.getData('tids'),function(i,v){
+                                tids[i]=v.value;
+                            });
+                            console.log(tids)
+                            $.ajax({
+                                url:'[[@{/rs/updRoleTransaction}]]',
+                                data:{
+                                    role_id:$("#role_id").val(),
+                                    tids:tids,
+                                },
+                                type:'POST',
+                                dataType:'json',
+                                success:function(res){
+                                    layer.msg(res.msg);
+                                    layer.close(layIndex);
+                                    $("#dataFrm").reset();//清空表单数据
+                                    window.location.reload();
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        });
+
+        //加载资源下拉框
+        $.ajax({
+            url:'[[@{/ts/selectAll}]]',
+            type:'GET',
+            dateType:'json',
+            success:function(res){
+                var content = "";
+                $.each(res.data,function(i,v){
+                    if (v.type==1){
+                        content += "<option value='"+v.transaction_id+"'>"+v.menu_name+"</option>";
+                    }
+                });
+                $("#parent_id").append(content);
+                form.render('select','dataFrm');
+            }
+        });
+        //初始化穿梭框
+        function loademps(role_id){
+            $.ajax({
+                url: '[[@{/rs/selectRVById}]]',
+                type: 'GET',
+                data:{role_id:role_id},
+                dateType: 'json',
+                success: function (mytransaction) {
+                    var myAry = new Array();
+                    $.each(mytransaction.data.transactions,function (i,v) {
+                        myAry[i] = v.transaction_id
+                    })
+                    myAry.push(100);
+                    myAry.push(101);
+                    $.ajax({
+                        url: '[[@{/ts/selectAll}]]',
+                        type: 'GET',
+                        dateType: 'json',
+                        success: function (alltransaction) {
+                            //显示搜索框
+                            transfer.render({
+                                elem: '#tids'
+                                ,data: alltransaction.data
+                                ,id:'tids'
+                                ,title: ['可选资源', '已选资源']
+                                ,showSearch: true
+                                ,width:300 //定义宽度
+                                ,height: 321
+                                ,value:myAry
+                                ,parseData: function(res){
+                                    return {
+                                        "value": res.transaction_id //数据值
+                                        ,"title": res.menu_name+"  ("+res.pname+")" //数据标题
+                                        ,"disabled": (res.transaction_id==100 || res.transaction_id==101)? true:false  //是否禁用
+                                        ,"checked": res.checked //是否选中
+                                    }
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        }
+    });
+</script>
+</body>
+</html>

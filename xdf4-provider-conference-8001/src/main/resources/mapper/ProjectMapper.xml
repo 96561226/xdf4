@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.ProjectMapper">
+    <resultMap id="projectVoMap" type="com.aaa.pojo.project.ProjectVo">
+        <result column="project_id" jdbcType="BIGINT" property="projectId" />
+        <result column="project_no" jdbcType="VARCHAR" property="projectNo" />
+        <result column="project_name" jdbcType="VARCHAR" property="projectName" />
+        <result column="project_predict_money" jdbcType="INTEGER" property="projectPredictMoney" />
+        <result column="project_use_money" jdbcType="INTEGER" property="projectUseMoney" />
+        <result column="project_beginTime" jdbcType="DATE" property="projectBeginTime" />
+        <result column="project_endTime" jdbcType="DATE" property="projectEndTime" />
+        <result column="emp_id" jdbcType="BIGINT" property="empId" />
+        <result column="project_remark" jdbcType="VARCHAR" property="projectRemark" />
+        <result column="project_type" jdbcType="BIGINT" property="projectType" />
+        <result column="project_state" jdbcType="INTEGER" property="projectState" />
+        <result column="document_id" jdbcType="BIGINT" property="documentId" />
+        <result column="task_id" jdbcType="BIGINT" property="taskId" />
+        <result column="emp_no" jdbcType="VARCHAR" property="empNo" />
+        <result column="emp_name" jdbcType="VARCHAR" property="empName" />
+        <result column="project_type_name" jdbcType="VARCHAR" property="projectTypeName" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="dname" jdbcType="VARCHAR" property="dname" />
+        <result column="accessory" jdbcType="VARCHAR" property="accessory" />
+    </resultMap>
+    <select id="selProjectDT" resultMap="projectVoMap" parameterType="com.aaa.pojo.project.ProjectVo">
+        SELECT p.*,emp.emp_no,emp.emp_name,pt.project_type_name,tk.title,dt.dname,dt.accessory
+        FROM tb_project p
+        LEFT JOIN tb_project_type pt on pt.project_type_id=p.project_type
+        LEFT JOIN tb_emp emp on emp.emp_id=p.emp_id
+        LEFT JOIN tb_task tk on tk.task_id=p.task_id
+        LEFT JOIN tb_document dt ON dt.id=p.document_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="projectNo!=null and projectNo!=''">and p.project_no=#{projectNo}</if>
+            <if test="projectType!=null and projectType!=''">and p.project_type=#{projectType}</if>
+            <if test="projectState!=null and projectState!=''">and p.project_state=#{projectState}</if>
+            <if test="empId!=null">and p.emp_id=#{empId}</if>
+        </trim>
+        ORDER BY p.project_id
+    </select>
+    <resultMap id="tbProjectTypeMap" type="com.aaa.pojo.project.TbProjectType">
+        <result column="project_type_id" jdbcType="BIGINT" property="projectTypeId" />
+        <result column="project_type_name" jdbcType="VARCHAR" property="projectTypeName" />
+    </resultMap>
+    <select id="selProjectType" resultMap="tbProjectTypeMap">
+        select * from tb_project_type;
+    </select>
+    <insert id="addProject" parameterType="com.aaa.pojo.project.TbProject">
+        INSERT INTO
+        tb_project(project_no,project_name,project_predict_money,project_use_money,project_beginTime,project_endTime,emp_id,project_remark,project_type,project_state,document_id,task_id)
+        VALUES(#{projectNo},#{projectName},#{projectPredictMoney},#{projectUseMoney},#{projectBeginTime},#{projectEndTime},#{empId},#{projectRemark},#{projectType},#{projectState},#{documentId},#{taskId})
+    </insert>
+    <update id="updProject" parameterType="com.aaa.pojo.project.TbProject">
+        UPDATE tb_project
+        SET project_use_money=#{projectUseMoney},project_endTime=#{projectEndTime},project_state=#{projectState}
+        WHERE project_id=#{projectId}
+    </update>
+</mapper>    

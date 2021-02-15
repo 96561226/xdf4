@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form">
+    <div class="layui-form-item" style="display: none;" id="fid">
+        <label class="layui-form-label">联系人编号</label>
+        <div class="layui-input-block">
+            <input id="did" type="text" name="id" readonly class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" id="dlinkname" name="linkname"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">头衔</label>
+        <div class="layui-input-block">
+            <input type="text" id="dtitle" name="title"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属单位</label>
+        <div class="layui-input-block">
+            <input type="text" id="dinstitution" name="institution"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">固定电话</label>
+        <div class="layui-input-block">
+            <input type="text" id="dgphone" name="gphone"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">移动电话</label>
+        <div class="layui-input-block">
+            <input type="text" id="dyphone" name="yphone"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="display: inline-block;">所属类型</label>
+        <div class="layui-input-block">
+            <input type="text" id="dtypeid" name="typeid"  readonly  class="layui-input">
+        </div>
+    </div>
+
+</form>
+</div>
+</body>
+</html>

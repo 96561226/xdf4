@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+
+<!--修改的弹出层-->
+<div style="display: none;padding: 20px;" id="propertyApplySP" th:fragment="propertyApply_SP">
+    <id class="layui-form-item"><h3>物品审批表</h3></id>
+    <form class="layui-form" id="propertyApplySPFrm" lay-filter="propertyApplySPFrm" type="post">
+        <h3>申请资料</h3>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">申请表id：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spapplyId" name="spapplyId" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">申请人id：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spempId" name="spempId" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">申请物品id：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppropertyId" name="sppropertyId" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请编号：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spapplyNo" name="spapplyNo" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请主题：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spapplyName" name="spapplyName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请人：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spempName" name="spempName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请物品：</label>
+            <div class="layui-input-block">
+                <input type="text" id="sppropertyName" name="sppropertyName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请时间：</label>
+            <div class="layui-input-block">
+                <input type="text" id="spapplyCreateTime" name="spapplyCreateTime" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <textarea id="spremark" name="spremark" class="layui-textarea"disabled></textarea>
+            </div>
+        </div>
+        <h3>审批区</h3>
+        <div class="layui-form-item">
+            <label class="layui-form-label">请输入您的意见：</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="myremark" name="myremark" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="forOK" id="bt2">同意</button>
+                <button class="layui-btn" lay-submit lay-filter="forNO" id="bt3">退回</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

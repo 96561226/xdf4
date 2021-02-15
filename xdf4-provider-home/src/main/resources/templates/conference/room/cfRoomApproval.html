@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>会议室申请审批</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<body>
+<div style="display: none;padding: 20px;" id="cfRoomApproval" th:fragment="cfRoom_approval">
+    <id class="layui-form-item"><h3>会议室申请审批</h3></id>
+    <form class="layui-form" id="approvalFrom" lay-filter="approvalFrom" type="post">
+        <div class="layui-form-item" style="display: none">
+            <label class="layui-form-label">申请id</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyId" name="applyId"  autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyNo" name="applyNo"  autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请主题</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyTheme" name="applyTheme" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">会议室名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="conferenceRoomName" name="conferenceRoomName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请时间</label>
+            <div class="layui-input-block">
+                <input type="text" id="applyCreateTime" name="applyCreateTime" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">时间段</label>
+            <div class="layui-input-block">
+                开始时间:<input type="text" id="applyBeginTime" name="applyBeginTime" autocomplete="off" class="layui-input" disabled>
+                结束时间:<input type="text" id="applyEndTime" name="applyEndTime" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请人</label>
+            <div class="layui-input-block">
+                <input type="text" id="empName" name="empName" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请理由</label>
+            <div class="layui-input-block">
+                <input type="text" id="remark" name="remark" autocomplete="off" class="layui-input" disabled>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="forOK" id="bt1">同意</button>
+                <button class="layui-btn" lay-submit lay-filter="forNO" id="bt2">退回</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

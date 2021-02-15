@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.mapper.DeptMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.Dept">
+        <id column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_no" jdbcType="VARCHAR" property="dept_no" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+        <result column="parent_id" jdbcType="INTEGER" property="parent_id" />
+        <result column="dept_loc" jdbcType="VARCHAR" property="dept_loc" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+    </resultMap>
+
+    <insert id="insertDept" parameterType="com.aaa.pojo.Dept">
+        insert into tb_dept(dept_no, dept_name, parent_id, dept_loc, type, remark)
+        value (#{dept_no},#{dept_name},#{parent_id},#{dept_loc},#{type},#{remark})
+    </insert>
+
+    <delete id="delDept">
+        delete from tb_dept where dept_id = #{dept_id}
+    </delete>
+
+    <update id="updDept" parameterType="com.aaa.pojo.Dept">
+        update tb_dept
+        <trim prefix="set " suffixOverrides=",">
+            <if test="dept_no!=null and dept_no!='' "> dept_no=#{dept_no}, </if>
+            <if test="dept_name!=null and dept_name!='' ">dept_name=#{dept_name},</if>
+            <if test="parent_id!=null"> parent_id= #{parent_id}, </if>
+            <if test="dept_loc!=null and dept_loc!='' "> dept_loc= #{dept_loc}, </if>
+            <if test="type!=null"> type= #{type}, </if>
+            <if test="remark!=null and remark!='' "> remark= #{remark}, </if>
+            <if test="state!=null"> state= #{state} </if>
+        </trim>
+        where dept_id = #{dept_id}
+    </update>
+
+    <select id="selDeptById" resultMap="BaseResultMap">
+        select * from tb_dept where dept_id = #{dept_id}
+    </select>
+    
+    <select id="selDeptAll" resultMap="BaseResultMap">
+        select * from tb_dept
+    </select>
+
+    <resultMap id="dv" type="com.aaa.pojo.DeptVo">
+        <id column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="dept_no" jdbcType="VARCHAR" property="dept_no" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+        <result column="parent_id" jdbcType="INTEGER" property="parent_id" />
+        <result column="pname" jdbcType="VARCHAR" property="pname" />
+        <result column="dept_loc" jdbcType="VARCHAR" property="dept_loc" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <collection property="emps" ofType="com.aaa.pojo.Emp" column="dept_id" select="com.aaa.mapper.EmpMapper.selectEmpByDept">
+            <id property="emp_id" jdbcType="INTEGER" column="emp_id"/>
+        </collection>
+        <collection property="roles" ofType="com.aaa.pojo.Roles" column="dept_id" select="com.aaa.mapper.RolesMapper.selectRolesByDept">
+            <id property="role_id" jdbcType="INTEGER" column="role_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="selDeptVoAll" resultMap="dv">
+        select td.*,td2.dept_name pname
+        from tb_dept td
+        left join tb_dept td2 on td.parent_id = td2.dept_id order by td.dept_no
+    </select>
+
+    <select id="selDeptVoById" resultMap="dv">
+        select td.*,td2.dept_name pname
+        from tb_dept td
+        left join tb_dept td2 on td.parent_id = td2.dept_id
+        where td.dept_id=#{dept_id} order by td.dept_no
+    </select>
+</mapper>

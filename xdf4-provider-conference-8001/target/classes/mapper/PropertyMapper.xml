@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PropertyMapper">
+    <!--模糊查询资产 的map-->
+    <resultMap id="propertyVoMap" type="com.aaa.pojo.conference.PropertyVo">
+        <result column="property_id" jdbcType="BIGINT" property="propertyId" />
+        <result column="property_no" jdbcType="VARCHAR" property="propertyNo" />
+        <result column="property_name" jdbcType="VARCHAR" property="propertyName" />
+        <result column="property_buytime" jdbcType="DATE" property="propertyBuytime" />
+        <result column="property_manufacturer" jdbcType="VARCHAR" property="propertyManufacturer" />
+        <result column="property_univalence" jdbcType="INTEGER" property="propertyUnivalence" />
+        <result column="property_place" jdbcType="VARCHAR" property="propertyPlace" />
+        <result column="property_state" jdbcType="INTEGER" property="propertyState" />
+        <result column="type_id" jdbcType="BIGINT" property="typeId" />
+        <result column="state_id" jdbcType="BIGINT" property="stateId" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+        <result column="type_name" jdbcType="VARCHAR" property="typeName" />
+    </resultMap>
+    <!--模糊查询资产-->
+    <select id="selPropertyByMH" resultMap="propertyVoMap"  parameterType="com.aaa.pojo.conference.TbProperty">
+        SELECT p.*, ps.state_name,pt.type_name
+        FROM tb_property p,tb_property_type pt,tb_property_state ps
+        WHERE p.state_id=ps.state_id AND p.type_id=pt.type_id
+        <trim>
+            <if test="propertyId!=null">and p.property_id=#{propertyId}</if>
+            <if test="propertyNo!=null and propertyNo!=''">and p.property_no=#{propertyNo}</if>
+            <if test="propertyName!=null">and p.property_name=#{propertyName}</if>
+            <if test="propertyManufacturer!=null">and p.property_manufacturer=#{propertyManufacturer}</if>
+            <if test="propertyState!=null">and p.property_state=#{propertyState}</if>
+            <if test="typeId!=null">and p.type_id=#{typeId}</if>
+            <if test="stateId!=null">and p.state_id=#{stateId}</if>
+        </trim>
+    </select>
+
+    <update id="updPropertyToMH" parameterType="com.aaa.pojo.conference.TbProperty">
+        update tb_property
+        <set>
+            <if test="propertyName!=null">property_name=#{propertyName},</if>
+            <if test="propertyManufacturer!=null">property_manufacturer=#{propertyManufacturer},</if>
+            <if test="propertyPlace!=null">property_place=#{propertyPlace},</if>
+            <if test="propertyState!=null">property_state=#{propertyState},</if>
+            <if test="typeId!=null">type_id=#{typeId},</if>
+            <if test="stateId!=null">state_id=#{stateId},</if>
+        </set>
+        where property_id=#{propertyId}
+    </update>
+
+    <resultMap id="tbPropertyStateMap" type="com.aaa.pojo.conference.TbPropertyState">
+        <result column="state_id" jdbcType="BIGINT" property="stateId" />
+        <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    </resultMap>
+    <select id="selState" resultMap="tbPropertyStateMap">
+        SELECT * FROM tb_property_state
+    </select>
+    <resultMap id="tbPropertyTypeMap" type="com.aaa.pojo.conference.TbPropertyType">
+        <result column="type_id" jdbcType="BIGINT" property="typeId" />
+        <result column="type_name" jdbcType="VARCHAR" property="typeName" />
+    </resultMap>
+    <select id="selType" resultMap="tbPropertyTypeMap">
+        SELECT * FROM tb_property_type
+    </select>
+
+    <insert id="addProperty" parameterType="com.aaa.pojo.conference.TbProperty">
+        INSERT INTO
+        tb_property(property_no,property_name,property_buytime,property_manufacturer,property_univalence,property_place,property_state,type_id,state_id)
+        VALUES
+        (#{propertyNo},#{propertyName},#{propertyBuytime},#{propertyManufacturer},#{propertyUnivalence},#{propertyPlace},#{propertyState},#{typeId},#{stateId});
+    </insert>
+</mapper>    

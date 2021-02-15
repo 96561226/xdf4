@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加或修改</title>
+</head>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <div class="layui-form-item">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <label class="layui-form-label">资源名称</label>
+            <div class="layui-inline">
+                <input id="transaction_id" type="hidden" name="transaction_id" placeholder="资源ID" autocomplete="off" class="layui-input">
+                <input id="menu_name" type="text" name="menu_name" required lay-verify="required" placeholder="资源名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">资源编号</label>
+                    <div class="layui-inline">
+                        <input type="text" id="transaction_no" name="transaction_no" required  lay-verify="required" placeholder="请输入资源编号" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">资源路径</label>
+                    <div class="layui-inline">
+                        <input type="text" id="menu_url" name="menu_url" required  lay-verify="required" placeholder="请输入资源路径" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">资源简述</label>
+                    <div class="layui-inline">
+                        <input type="text" id="remark" name="remark" placeholder="请输入关于资源描述" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">资源类型</label>
+                    <div class="layui-input-block">
+                        <select name="type" lay-filter="type" id="type"  required  lay-verify="required">
+                            <option value="1">目录</option>
+                            <option value="2">页面</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md3"><div class="layui-form-item"></div></div>
+            <div class="layui-col-md5">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属资源</label>
+                    <div class="layui-input-block">
+                        <select name="parent_id" lay-filter="parent_id" id="parent_id" lay-search>
+                            <option value="0">请选择</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-col-md5"><div class="layui-form-item"></div></div>
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>

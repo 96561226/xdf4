@@ -1,0 +1,54 @@
+server:
+  port: 2077
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/f4?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    username: root
+    password: 123456
+  application:
+    name: xdf4-provide-objectplan
+  thymeleaf:
+    cache: false
+    suffix: .html
+  jackson:
+    # \u5982\u679C\u4F7F\u7528\u5B57\u7B26\u4E32\u661F\u8868\u793A\u7528\u8FD9\u884C\u683C\u5F0F
+    date-format: yyyy-MM-dd
+    # \u8BBE\u7F6E\u4E3A\u4E1C\u516B\u533A\u65F6\u95F4
+    timezone: GMT+8
+    # \u60F3\u8981\u503C\u4E3A2016-01-01
+    serialization:
+      write-dates-as-timestamps: false
+mybatis:
+  type-aliases-package: com.aaa.pojo  # \u6279\u91CF\u8BBE\u7F6E\u522B\u540D
+  mapper-locations: classpath:com/aaa/springcloud/mapper/*.xml,classpath:mapper/*.xml  # \u8BBE\u7F6Emapper\u7684\u8DEF\u5F84
+  configuration:
+    auto-mapping-behavior: full # \u8BBE\u7F6E\u5168\u81EA\u52A8\u6620\u5C04
+    use-column-label: true # \u8BBE\u7F6E\u522B\u540D\u53EF\u4EE5\u505A\u5217\u540D
+
+eureka:
+  client:
+    #表示是否将自己注册进EurekaServer默认为true
+    register-with-eureka: true
+    #是否从EurekaServer抓取已有的注册信息，默认为true。单节点无所谓，集群必须设置为true才能配合ribbon使用 负载均衡
+    fetch-registry: true
+    service-url:
+#      defaultZone:  http://eureka7002.com:7002/eureka/,http://eureka7001.com:7001/eureka/
+      defaultZone:  http://eureka7001.com:7001/eureka/
+#设置feign客户端超时时间
+ribbon:
+  # 建立连接所用时间
+  ReadTimeout: 5000
+  # 建立连接后读取可用资源所用的时间
+  ConnectTimeout: 5000
+
+logging:
+  level:
+    com:
+      aaa:
+        springcloud:
+          mapper: debug
+#logging:
+#  level:
+#    # 选择具体接口的方法 的日志输出 级别为debug
+#    com.atguigu.springcloud.service.PaymentFeignService: debug

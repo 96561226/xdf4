@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.demo.mapper.ClientMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.client.TbclientVo">
+        <id column="c_id" jdbcType="INTEGER" property="c_id" />
+        <association column="type_id" javaType="com.aaa.pojo.client.TbclientType" property="type">
+            <id column="type_id" jdbcType="INTEGER" property="type_id" />
+        </association>
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aaa.pojo.client.SearchClient">
+        SELECT c.*,t.typename FROM tb_client c
+        LEFT JOIN tb_client_type t
+        ON c.type_id=t.type_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="cname != null and cname!=''">
+                and c.cname like "%"#{cname}"%"
+            </if>
+            <if test="type_id != null">
+                and c.type_id = #{type_id}
+            </if>
+        </trim>
+        order by c.c_id desc
+    </select>
+    <!--单独用来查询客户名称的方法-->
+    <select id="selectCname" resultType="com.aaa.pojo.client.Tbclient">
+        select c_id,cname from tb_client
+    </select>
+
+    <select id="findByID" parameterType="int" resultType="com.aaa.pojo.client.Tbclient">
+        select * from tb_client where c_id = #{c_id}
+    </select>
+
+    <insert id="insert" parameterType="com.aaa.pojo.client.Tbclient">
+        insert into tb_client (cname,predict,p_count,pactmoney,returned,s_count,type_id)
+        values (#{cname}, #{predict},#{p_count},
+        #{pactmoney}, #{returned},#{s_count},#{type_id})
+    </insert>
+
+    <delete id="del" parameterType="int">
+        delete from tb_client where c_id = #{c_id}
+    </delete>
+
+    <update id="update" parameterType="com.aaa.pojo.client.Tbclient">
+        update tb_client set cname = #{cname},predict = #{predict},
+        p_count = #{p_count},pactmoney = #{pactmoney},returned = #{returned},
+        s_count = #{s_count},serve = #{serve},type_id = #{type_id}
+        where c_id = #{c_id}
+    </update>
+</mapper>

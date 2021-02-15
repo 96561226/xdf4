@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.demo.mapper.DocumentMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.informaction.TbdocumentVo">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <association column="type_id" javaType="com.aaa.pojo.informaction.TbdocumentType" property="type">
+            <id column="type_id" jdbcType="INTEGER" property="type_id" />
+        </association>
+        <association column="dept_id" javaType="com.aaa.pojo.Dept" property="dept">
+            <id column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        </association>
+    </resultMap>
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aaa.pojo.informaction.SearchDocument">
+        SELECT d.*,t.type_name,dp.dept_name FROM tb_document d
+        LEFT JOIN tb_dept dp
+        ON d.dept_id=dp.dept_id
+        LEFT JOIN tb_document_type t
+        ON d.type_id=t.type_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="dept_id != null">
+                and d.dept_id = #{dept_id}
+            </if>
+            <if test="type_id != null">
+                and d.type_id = #{type_id}
+            </if>
+        </trim>
+    </select>
+
+    <select id="findByID" parameterType="int" resultType="com.aaa.pojo.informaction.Tbdocument">
+    select * from tb_document where id = #{id}
+  </select>
+
+    <insert id="insert" parameterType="com.aaa.pojo.informaction.Tbdocument">
+        insert into tb_document (dname,versions,author,type_id,
+        keyword,dept_id,accessory,updatetime,filename)
+        values (#{dname}, #{versions},#{author},#{type_id},
+        #{keyword}, #{dept_id},#{accessory},#{updatetime},#{filename})
+    </insert>
+
+    <delete id="del" parameterType="int">
+        delete from tb_document where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.aaa.pojo.informaction.Tbdocument">
+        update tb_document set dname = #{dname},versions = #{versions},
+        author = #{author},type_id = #{type_id},
+        keyword = #{keyword},dept_id = #{dept_id},
+        accessory = #{accessory},updatetime = #{updatetime},
+        filename=#{filename}
+        where id = #{id}
+    </update>
+
+    <!--对文档进行删除后的恢复 查看-->
+    <insert id="insertDustbin" parameterType="int">
+        insert into tb_docDustbin
+        select * from tb_document
+        where id=#{id}
+    </insert>
+
+    <insert id="insertDoc" parameterType="int">
+        insert into tb_document
+        select * from tb_docDustbin
+        where id=#{id}
+    </insert>
+
+    <select id="selectDustbin" resultMap="BaseResultMap" parameterType="com.aaa.pojo.informaction.SearchDocDustbin">
+        SELECT d.*,t.type_name,dp.dept_name FROM tb_docDustbin d
+        LEFT JOIN tb_dept dp
+        ON d.dept_id=dp.dept_id
+        LEFT JOIN tb_document_type t
+        ON d.type_id=t.type_id
+        <trim prefix="where" prefixOverrides="and">
+            <if test="dept_id != null">
+                and d.dept_id = #{dept_id}
+            </if>
+            <if test="type_id != null">
+                and d.type_id = #{type_id}
+            </if>
+        </trim>
+    </select>
+
+    <delete id="deldustbin" parameterType="int">
+        delete from tb_docDustbin where id = #{id}
+    </delete>
+
+</mapper>

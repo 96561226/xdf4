@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PropertyApproverMapper">
+    <resultMap id="propertyApproverVoMap" type="com.aaa.pojo.conference.PropertyApproverVo">
+        <result column="id" jdbcType="BIGINT" property="id" />
+        <result column="apply_id" jdbcType="BIGINT" property="applyId" />
+        <result column="did" jdbcType="BIGINT" property="empId" />
+        <result column="dno" jdbcType="VARCHAR" property="empNo" />
+        <result column="dname" jdbcType="VARCHAR" property="empName" />
+        <result column="dremark" jdbcType="VARCHAR" property="remark" />
+        <result column="dstate" jdbcType="INTEGER" property="state" />
+    </resultMap>
+    <select id="selPropertyApproverAll" resultMap="propertyApproverVoMap">
+        SELECT par.id,par.apply_id,par.emp_id did,par.remark dremark,par.state dstate,emp.emp_no dno,emp.emp_name dname
+        FROM tb_property_approver par,tb_emp emp
+        WHERE par.emp_id=emp.emp_id and apply_id=#{apply_id}
+    </select>
+    <!--添加-->
+    <insert id="addPropertyApprover" parameterType="com.aaa.pojo.conference.TbPropertyApprover">
+        INSERT INTO tb_property_approver(apply_id,emp_id,remark,state)
+        VALUES(#{applyId},#{empId},#{remark},#{state})
+    </insert>
+    <!--修改-->
+    <update id="updPropertyApprover" parameterType="com.aaa.pojo.conference.TbPropertyApprover">
+        UPDATE tb_property_approver SET state=#{state},remark=#{remark} WHERE apply_id=#{applyId} and emp_id=#{empId}
+    </update>
+</mapper>    

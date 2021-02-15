@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.springcloud.mapper.PlanMapper">
+    <resultMap id="BaseResultMap" type="com.aaa.pojo.plans.TbPlan">
+        <id column="plan_id" jdbcType="INTEGER" property="plan_id" />
+        <result column="plan_no" jdbcType="VARCHAR" property="plan_no" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        <result column="parent_id" jdbcType="INTEGER" property="parent_id" />
+        <result column="cdate" jdbcType="DATE" property="cdate" />
+        <result column="sdate" jdbcType="DATE" property="sdate" />
+        <result column="edate" jdbcType="DATE" property="edate" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+    </resultMap>
+
+    <resultMap id="planVo" type="com.aaa.pojo.plans.PlanVo">
+        <id column="plan_id" jdbcType="INTEGER" property="plan_id" />
+        <result column="plan_no" jdbcType="VARCHAR" property="plan_no" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="emp_id" jdbcType="INTEGER" property="emp_id" />
+        <result column="dept_id" jdbcType="INTEGER" property="dept_id" />
+        <result column="emp_name" jdbcType="VARCHAR" property="emp_name" />
+        <result column="dept_name" jdbcType="VARCHAR" property="dept_name" />
+        <result column="parent_id" jdbcType="INTEGER" property="parent_id" />
+        <result column="pname" jdbcType="VARCHAR" property="pname" />
+        <result column="cdate" jdbcType="DATE" property="cdate" />
+        <result column="sdate" jdbcType="DATE" property="sdate" />
+        <result column="edate" jdbcType="DATE" property="edate" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="fstate_name" jdbcType="VARCHAR" property="fstate_name" />
+        <collection property="planActions" ofType="com.aaa.pojo.plans.TbPlanAction">
+            <id column="plan_aid" jdbcType="INTEGER" property="plan_aid" />
+            <result column="plan_id" jdbcType="INTEGER" property="pid" />
+            <result column="aemp_id" jdbcType="INTEGER" property="action_emp_id" />
+            <result column="aname" jdbcType="VARCHAR" property="emp_name" />
+        </collection>
+        <collection property="planCharges" ofType="com.aaa.pojo.plans.TbPlanCharge">
+            <id column="plan_cid" jdbcType="INTEGER" property="plan_cid" />
+            <result column="plan_id" jdbcType="INTEGER" property="pid" />
+            <result column="cemp_id" jdbcType="INTEGER" property="charge_emp_id" />
+            <result column="cname" jdbcType="VARCHAR" property="emp_name" />
+            <result column="cstate" jdbcType="VARCHAR" property="state_name" />
+        </collection>
+        <collection property="planSchedulings" ofType="com.aaa.pojo.plans.TbPlanScheduling" column="plan_id" select="com.aaa.springcloud.mapper.PlanSchedulingMapper.selPlanSchedulingByPlanId">
+            <id column="plan_sid" jdbcType="INTEGER" property="plan_sid" />
+        </collection>
+    </resultMap>
+
+    <insert id="insertPlan" parameterType="com.aaa.pojo.plans.TbPlan">
+        insert into tb_plan(plan_no, title, emp_id,dept_id, parent_id, cdate, sdate, edate, type)
+            value (#{plan_no},#{title},#{emp_id},#{dept_id},#{parent_id},#{cdate},#{sdate},#{edate},#{type})
+    </insert>
+
+    <update id="updPlan" parameterType="com.aaa.pojo.plans.TbPlan">
+        update tb_plan
+        <trim prefix="set " suffixOverrides=",">
+            <if test="plan_no!=null">plan_no=#{plan_no},</if>
+            <if test="title!=null">title=#{title},</if>
+            <if test="emp_id!=null">emp_id=#{emp_id},</if>
+            <if test="dept_id!=null">dept_id=#{dept_id},</if>
+            <if test="parent_id!=null">parent_id=#{parent_id},</if>
+            <if test="cdate!=null">cdate=#{cdate},</if>
+            <if test="sdate!=null">sdate=#{sdate},</if>
+            <if test="edate!=null">edate=#{edate},</if>
+            <if test="type!=null">type=#{type},</if>
+            <if test="state!=null">state=#{state}</if>
+        </trim>
+        where plan_id = #{plan_id}
+    </update>
+
+    <delete id="delPlan" parameterType="LONG">
+        delect from tb_plan where plan_id = #{plan_id}
+    </delete>
+
+
+    <select id="selPlanAll" resultMap="planVo" parameterType="com.aaa.searchpojo.SearchPlan">
+        select p.*,tp.title pname,te.emp_name,td.dept_name,tfs.fstate_name,tpt.name type_name
+        ,techarge.emp_name cname,techarge.emp_id cemp_id,tas.state_name cstate
+        ,teaction.emp_name aname,teaction.emp_id aemp_id
+        ,tpc.plan_cid,tpa.plan_aid
+        from tb_plan p
+        left join tb_plan tp on  p.parent_id = tp.plan_id
+        inner join tb_emp te on p.emp_id = te.emp_id
+        inner join tb_dept td on p.dept_id = td.dept_id
+        inner join tb_form_state tfs on p.state = tfs.state_id
+        inner join tb_plan_type tpt on p.type = tpt.plan_tid
+
+        left join tb_plan_charge tpc on p.plan_id = tpc.pid
+        left join tb_emp techarge on techarge.emp_id = tpc.charge_emp_id
+        left join tb_approver_state tas on tpc.state = tas.state_id
+
+
+        left join tb_plan_action tpa on p.plan_id = tpa.pid
+        left join tb_emp teaction on teaction.emp_id = tpa.action_emp_id
+
+
+        <trim prefix="where" prefixOverrides="and">
+
+            <if test="charge_emp_id!=null"> and tpc.charge_emp_id = #{charge_emp_id} </if>
+            <if test="action_emp_id!=null"> and tpa.action_emp_id = #{action_emp_id} </if>
+
+            <if test="plan_id!=null"> and p.plan_id=#{plan_id} </if>
+            <if test="plan_no!=null and plan_no!=''"> and p.plan_no=#{plan_no} </if>
+            <if test="title!=null and title!=''"> and p.title like #{title} </if>
+            <if test="dept_id!=null"> and p.dept_id=#{dept_id} </if>
+            <if test="emp_id!=null"> and p.emp_id=#{emp_id} </if>
+            <if test="parent_id!=null"> and p.parent_id=#{parent_id} </if>
+            <if test="parent_no!=null and parent_no!=''"> and tp.plan_no=#{parent_no} </if>
+            <if test="cdate!=null"> and p.cdate=#{cdate} </if>
+            <if test="sdate!=null"> and p.cdate>#{sdate} </if>
+            <if test="edate!=null"> <![CDATA[and p.cdate<#{edate} ]]></if>
+            <if test="type!=null"> and p.type=#{type} </if>
+            <if test="state!=null"> and p.state=#{state} </if>
+        </trim>
+        order by plan_no desc
+    </select>
+
+    <select id="selPlanTypes" resultType="com.aaa.pojo.plans.TbPlanType">
+        select * from tb_plan_type
+    </select>
+
+</mapper>

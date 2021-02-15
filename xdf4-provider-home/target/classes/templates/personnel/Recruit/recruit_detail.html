@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form" id="recruitForm" lay-filter="recruitForm" type="post">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>详细信息</legend>
+        <div class="layui-form-item" style="display: none;" id="fid">
+            <label class="layui-form-label">id</label>
+            <div class="layui-input-block">
+                <input id="drecruitId" type="text" name="recruitId" readonly class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="drecruitNo" name="recruitNo"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">主题</label>
+            <div class="layui-input-block">
+                <input type="text" id="dtheme" name="theme"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">员工</label>
+            <div class="layui-input-block">
+                <input type="text" id="dempName" name="empName"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">招聘岗位</label>
+            <div class="layui-input-block">
+                <input type="text" id="droleName" name="roleName"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">招聘人数</label>
+            <div class="layui-input-block">
+                <input type="text" id="dnumber" name="number"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">到岗日期</label>
+            <div class="layui-input-block">
+                <input type="text" id="darrivalDate" name="arrivalDate"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">事由</label>
+            <div class="layui-input-block">
+                <input type="text" id="dcause" name="cause"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">工作内容</label>
+            <div class="layui-input-block">
+                <input type="text" id="dcontent" name="content"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">最小年龄</label>
+            <div class="layui-input-block">
+                <input type="text" id="dminAge" name="minAge"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">最大年龄</label>
+            <div class="layui-input-block">
+                <input type="text" id="dmaxAge" name="maxAge"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-block">
+                <input type="text" id="dsex" name="sex" readonly class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">外语要求</label>
+            <div class="layui-input-block">
+                <input type="text" id="dforeignRequire" name="foreignRequire"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">学历</label>
+            <div class="layui-input-block">
+                <input type="text" id="deducation" name="education"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">专业</label>
+            <div class="layui-input-block">
+                <input type="text" id="dmajor" name="major"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">工作地点</label>
+            <div class="layui-input-block">
+                <input type="text" id="dsite" name="site"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">经验需求</label>
+            <div class="layui-input-block">
+                <input type="text" id="dexperience" name="experience"  readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布日期</label>
+            <div class="layui-input-block">
+                <input type="text" id="dapplyDate" name="applyDate"  readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">结束日期</label>
+            <div class="layui-input-block">
+                <input type="text" id="dendDate" name="endDate"  readonly   class="layui-input" placeholder="未结束">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="text" id="dstateName" name="stateName"  readonly   class="layui-input">
+            </div>
+        </div>
+    </fieldset>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>审批人</legend>
+        <table lay-even class="layui-table" id="approver" lay-filter="approver"></table>
+    </fieldset>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>知会人</legend>
+        <table lay-even class="layui-table" id="notify" lay-filter="notify"></table>
+    </fieldset>
+    <div id="dplan_state"></div>
+</form>
+</div>
+</body>
+</html>

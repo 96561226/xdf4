@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form">
+    <div class="layui-form-item" style="display: none;" id="fid">
+        <label class="layui-form-label">联系人编号</label>
+        <div class="layui-input-block">
+            <input id="did" type="text" name="id" readonly class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">联系人图片</label>
+        <div class="layui-input-block">
+            <img class="layui-upload-img" id="ddemo1" style="width:50px;height:50px;border-radius: 25px; text-align: center;">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="display: inline-block;">姓名</label>
+        <div class="layui-input-block">
+        <input type="text" id="demp_id" name="emp_id"  readonly  class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">个性签名</label>
+        <div class="layui-input-block">
+            <input type="text" id="dsignature" name="signature"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="display: inline-block;">所属机构</label>
+        <div class="layui-input-block">
+            <input type="text" id="ddept_id" name="dept_id"  readonly  class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">固定电话</label>
+        <div class="layui-input-block">
+            <input type="text" id="dgphone" name="gphone"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">移动电话</label>
+        <div class="layui-input-block">
+            <input type="text" id="dyphone" name="yphone"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">电子邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" id="demail" name="email"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">紧急联系人</label>
+        <div class="layui-input-block">
+            <input type="text" id="durgent" name="urgent"  readonly   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">即时通信</label>
+        <div class="layui-input-block">
+            <input type="text" id="dim" name="im"  readonly   class="layui-input">
+        </div>
+    </div>
+
+</form>
+</div>
+</body>
+</html>

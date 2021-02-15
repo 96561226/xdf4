@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>详情页</title>
+</head>
+<body>
+<div id="detail" style="display: none;padding: 20px;" th:fragment="detail_common">
+<form class="layui-form" id="transferForm" lay-filter="transferForm" type="post">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>详细信息</legend>
+        <div class="layui-form-item" style="display: none;" id="fid">
+            <label class="layui-form-label">id</label>
+            <div class="layui-input-block">
+                <input id="dtransferId" type="text" name="transferId" readonly class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-block">
+                <input type="text" id="dtransferNo" readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">主题</label>
+            <div class="layui-input-block">
+                <input type="text" id="dtheme" readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">调动人</label>
+            <div class="layui-input-block">
+                <input type="text" id="dempName" readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">旧部门</label>
+            <div class="layui-input-block">
+                <input type="text" id="ddeptName" readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新部门</label>
+            <div class="layui-input-block">
+                <input type="text" id="dnewDeptName" readonly   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">旧岗位</label>
+            <div class="layui-input-block">
+                <input type="text" id="droleName" readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新岗位</label>
+            <div class="layui-input-block">
+                <input type="text" id="dnewRoleName" readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">调动类型</label>
+            <div class="layui-input-block">
+                <input type="text" id="dtypeName" readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">离职原因</label>
+            <div class="layui-input-block">
+                <input type="text" id="dcause" readonly   class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">主管意见</label>
+            <div class="layui-input-block">
+                <input type="text" id="dopinion" readonly   class="layui-input" placeholder="无">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新主管意见</label>
+            <div class="layui-input-block">
+                <input type="text" id="dnewOpinion" readonly   class="layui-input" placeholder="无">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">申请日期</label>
+            <div class="layui-input-block">
+                <input type="text" id="dapplyDate" readonly class="layui-input" placeholder="不限制">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">结束日期</label>
+            <div class="layui-input-block">
+                <input type="text" id="dendDate" readonly   class="layui-input" placeholder="未审核">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="text" id="dstateName" readonly   class="layui-input">
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>审批人</legend>
+        <table lay-even class="layui-table" id="approver" lay-filter="approver"></table>
+    </fieldset>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>知会人</legend>
+        <table lay-even class="layui-table" id="notify" lay-filter="notify"></table>
+    </fieldset>
+
+    <div id="dplan_state"></div>
+</form>
+</div>
+</body>
+</html>

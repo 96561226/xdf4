@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>入职申请</title>
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/layui/2.5.6/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/layui/2.5.6/css/layui.css}"/>
+</head>
+<style>
+    table td{
+        width: 100px;
+    }
+</style>
+<body>
+<!--添加或者修改的弹出层start-->
+<div style="display: none;padding: 20px;" id="saveOrUpdateDiv" th:fragment="addOrUpdate">
+    <form class="layui-form"  id="dataFrm" lay-filter="dataFrm" type="post">
+        <table class="layui-table" id="tab">
+            <tr>
+                <td>申请编号</td>
+                <td colspan="2">
+                    <input disabled type="button" style="width: 100%;text-align: left" id="dimissionNo" name="dimissionNo"  class="layui-btn layui-btn-primary">
+                </td>
+                <td>*申请人</td>
+                <td colspan="2">
+                    <select lay-filter="emp" name="empId" id="empId" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>*预计离职日期</td>
+                <td colspan="2">
+                    <input type="text" id="dimissionDate" name="dimissionDate" required lay-verify="required"  class="layui-input">
+                </td>
+            </tr>
+            <tr>
+                <td>*所属部门</td>
+                <td colspan="2">
+                    <select lay-filter="dept" name="deptId" id="deptId" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>*在职岗位</td>
+                <td colspan="2">
+                    <select lay-filter="role" name="roleId" id="roleId" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+                <td>离职类型</td>
+                <td colspan="2">
+                    <select lay-filter="type" name="typeId" id="typeId" required lay-verify="required">
+                        <option value="">请选择</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>离职原因</td>
+                <td colspan="8">
+                    <textarea name="cause" placeholder="离职原因" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>工作交接</td>
+                <td colspan="8">
+                    <textarea name="connect" placeholder="工作交接" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>主管意见</td>
+                <td colspan="8">
+                    <textarea name="opinion" placeholder="主管意见" class="layui-textarea"></textarea>
+                </td>
+            </tr>
+        </table>
+        <div class="layui-form-item">
+            <label class="layui-form-label">审批人</label>
+            <div id="charge_emp_ids" name="charge_emp_ids" class="demo-transfer"></div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo" id="bt1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="bt2">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<!--添加或者修改的弹出层end-->
+</body>
+</html>
